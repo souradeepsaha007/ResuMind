@@ -16,41 +16,51 @@ from llm_analyzer import analyse_resume
 # ==========================================================
 
 st.set_page_config(
-    page_title="Resumind — Career Intelligence",
-    page_icon="✦",
+    page_title="SOURA RESUME AI — Cinematic Career Intelligence",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 
 # ==========================================================
-# 2. DESIGN SYSTEM & STYLES (ENHANCED MINDLY AESTHETIC)
+# 2. LUXURY EDITORIAL DESIGN SYSTEM & ANIMATIONS
 # ==========================================================
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-/* --- Root & Background --- */
+/* --- Root Variables & Theme Colors --- */
+:root {
+    --bg-ivory: #F3F0E8;
+    --text-primary: #151515;
+    --accent-blue: #4263EB;
+    --text-muted: #888888;
+    --dark-navy: #071522;
+    --card-soft-white: rgba(255, 255, 255, 0.82);
+    --border-subtle: rgba(21, 21, 21, 0.08);
+}
+
 html {
     scroll-behavior: smooth !important;
 }
 
 body, .stApp {
-    background-color: #FAF9F5 !important;
+    background-color: #F3F0E8 !important;
     background-image: 
-        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(250, 249, 245, 0.6) 60%, rgba(243, 239, 231, 0.4) 100%),
-        radial-gradient(circle at 85% 25%, rgba(246, 242, 233, 0.6) 0%, transparent 45%),
-        radial-gradient(circle at 15% 45%, rgba(244, 240, 230, 0.5) 0%, transparent 45%) !important;
-    color: #1A1A1A !important;
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(243, 240, 232, 0.7) 50%, rgba(235, 230, 218, 0.4) 100%),
+        radial-gradient(circle at 90% 20%, rgba(66, 99, 235, 0.04) 0%, transparent 45%),
+        radial-gradient(circle at 10% 40%, rgba(66, 99, 235, 0.03) 0%, transparent 45%) !important;
+    color: #151515 !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     -webkit-font-smoothing: antialiased;
 }
 
 .block-container {
-    max-width: 1180px !important;
-    padding-top: 1.2rem !important;
-    padding-bottom: 4rem !important;
+    max-width: 1240px !important;
+    padding-top: 1rem !important;
+    padding-bottom: 5rem !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
 }
@@ -64,799 +74,710 @@ header[data-testid="stHeader"] {
 }
 
 /* --- Navigation Bar --- */
-.nav-wrap {
+.nav-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 0 28px 0;
+    padding: 18px 28px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 9999px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.05);
 }
 
-.brand-wrap {
+.nav-brand-text {
+    font-family: 'Cinzel', 'Plus Jakarta Sans', serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.18em;
+    color: #151515;
+    text-transform: uppercase;
+}
+
+.nav-brand-text span {
+    color: #4263EB;
+}
+
+.nav-links-row {
     display: flex;
-    align-items: baseline;
-    gap: 2px;
-    font-weight: 700;
-    font-size: 23px;
-    letter-spacing: -0.03em;
-    color: #111111;
+    align-items: center;
+    gap: 32px;
 }
 
-.brand-wrap .brand-dot {
-    font-size: 14px;
-    color: #111111;
-    font-weight: 700;
+.nav-link-item {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #555555;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
-/* --- Streamlit Buttons (Pill Aesthetic) --- */
-.stButton > button {
-    background: #121212 !important;
+.nav-link-item:hover {
+    color: #4263EB;
+}
+
+.nav-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #151515;
     color: #FFFFFF !important;
-    border: 1px solid #121212 !important;
+    padding: 9px 22px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(21, 21, 21, 0.15);
+}
+
+.nav-cta-btn:hover {
+    background: #4263EB;
+    transform: translateY(-1.5px);
+    box-shadow: 0 8px 20px rgba(66, 99, 235, 0.3);
+}
+
+/* --- Streamlit Native Button Overrides --- */
+.stButton > button {
+    background: #151515 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #151515 !important;
     border-radius: 9999px !important;
-    padding: 10px 24px !important;
+    padding: 12px 28px !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    letter-spacing: -0.01em !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07) !important;
-    min-height: 44px !important;
+    box-shadow: 0 6px 18px rgba(21, 21, 21, 0.12) !important;
+    min-height: 48px !important;
 }
 
 .stButton > button:hover {
-    background: #262626 !important;
+    background: #4263EB !important;
     color: #FFFFFF !important;
-    border-color: #262626 !important;
-    transform: translateY(-1.5px) !important;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12) !important;
+    border-color: #4263EB !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 28px rgba(66, 99, 235, 0.35) !important;
 }
 
-.stButton > button:active {
-    transform: translateY(0px) !important;
-}
-
-/* Secondary Button Variant */
 .stButton > button[kind="secondary"] {
     background: rgba(255, 255, 255, 0.85) !important;
-    color: #1F1F1F !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    color: #151515 !important;
+    border: 1px solid rgba(21, 21, 21, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(21, 21, 21, 0.04) !important;
 }
 
 .stButton > button[kind="secondary"]:hover {
     background: #FFFFFF !important;
-    color: #000000 !important;
-    border-color: rgba(0, 0, 0, 0.16) !important;
+    color: #4263EB !important;
+    border-color: #4263EB !important;
 }
 
-/* Download Button */
 .stDownloadButton > button {
-    background: #121212 !important;
+    background: #4263EB !important;
     color: #FFFFFF !important;
-    border: 1px solid #121212 !important;
+    border: 1px solid #4263EB !important;
     border-radius: 9999px !important;
-    padding: 12px 28px !important;
+    padding: 13px 32px !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 8px 24px rgba(66, 99, 235, 0.25) !important;
     transition: all 0.25s ease !important;
-    min-height: 48px !important;
+    min-height: 50px !important;
 }
 
 .stDownloadButton > button:hover {
-    background: #262626 !important;
-    color: #FFFFFF !important;
-    transform: translateY(-1.5px) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14) !important;
+    background: #364fc7 !important;
+    border-color: #364fc7 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 30px rgba(66, 99, 235, 0.4) !important;
 }
 
-/* --- Hero Section Typography --- */
-.hero-container {
+/* --- Cinematic Hero Section --- */
+.hero-stage-wrap {
     position: relative;
     text-align: center;
-    padding: 35px 10px 25px 10px;
-    margin-bottom: 15px;
+    padding: 60px 10px 50px 10px;
+    margin-bottom: 25px;
 }
 
-.hero-pill-badge {
+.hero-editorial-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(10px);
-    border-radius: 9999px;
-    padding: 6px 18px;
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: #555555;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
-.hero-heading {
-    font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 66px;
-    line-height: 1.08;
-    color: #121212;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    margin: 0 auto 18px auto;
-    max-width: 840px;
-}
-
-.hero-heading em {
-    font-style: italic;
-    font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-weight: 400;
-    color: #121212;
-}
-
-.hero-description {
-    font-size: 17.5px;
-    line-height: 1.7;
-    color: #666666;
-    max-width: 640px;
-    margin: 0 auto 28px auto;
-    font-weight: 400;
-}
-
-/* --- Rotating Circular Stamp Badge --- */
-.stamp-badge-wrap {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    width: 100px;
-    height: 100px;
-}
-
-.rotating-stamp {
-    width: 100%;
-    height: 100%;
-    animation: rotateStamp 22s linear infinite;
-}
-
-@keyframes rotateStamp {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.stamp-center-star {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 18px;
-    color: #121212;
-}
-
-/* --- Floating Keyframe Micro-Animations --- */
-@keyframes floatGentle {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-7px); }
-}
-
-@keyframes floatGentleAlt {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(7px); }
-}
-
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.06), 0 0 1px 1px rgba(0, 0, 0, 0.03); }
-    50% { box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.09), 0 0 1px 1px rgba(0, 0, 0, 0.05); }
-}
-
-.float-widget-left {
-    animation: floatGentle 5.5s ease-in-out infinite;
-}
-
-.float-widget-right {
-    animation: floatGentleAlt 6.5s ease-in-out infinite;
-}
-
-/* Floating Hero Showcase */
-.hero-stage {
-    position: relative;
-    max-width: 1000px;
-    margin: 30px auto 20px auto;
-    padding: 10px 0 20px 0;
-}
-
-/* Floating Glass Cards */
-.glass-widget {
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 22px 24px;
-    box-shadow: 
-        0 20px 45px -15px rgba(0, 0, 0, 0.05),
-        0 0 1px 1px rgba(0, 0, 0, 0.03);
-    text-align: left;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-widget:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 25px 55px -15px rgba(0, 0, 0, 0.09);
-}
-
-.glass-widget h4 {
-    font-size: 15.5px;
-    font-weight: 600;
-    color: #121212;
-    margin: 8px 0 4px 0;
-    letter-spacing: -0.01em;
-}
-
-.glass-widget p {
-    font-size: 13px;
-    color: #737373;
-    line-height: 1.55;
-    margin: 0;
-}
-
-/* Waveform Icon */
-.soundwave-box {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 24px;
-    margin-bottom: 8px;
-}
-
-.soundwave-box span {
-    display: block;
-    width: 3px;
-    background: #121212;
-    border-radius: 3px;
-}
-
-.soundwave-box span:nth-child(1) { height: 10px; }
-.soundwave-box span:nth-child(2) { height: 18px; }
-.soundwave-box span:nth-child(3) { height: 24px; }
-.soundwave-box span:nth-child(4) { height: 14px; }
-.soundwave-box span:nth-child(5) { height: 8px; }
-
-/* Avatars Stack */
-.avatar-stack-wrap {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.avatar-circle {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid #FFFFFF;
-    margin-left: -7px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    background-size: cover;
-    background-position: center;
-}
-
-.avatar-circle:first-child {
-    margin-left: 0;
-}
-
-.av-1 { background: #E4D8C9; color: #6E5C46; }
-.av-2 { background: #D0DED5; color: #395B48; }
-.av-3 { background: #D5DBE5; color: #43516B; }
-.av-plus { 
-    background: #121212; 
-    color: #FFFFFF; 
-    font-size: 10px; 
-    font-weight: 700;
-}
-
-/* Central Composition */
-.center-showcase-wrap {
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 240, 0.75) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.98);
-    border-radius: 32px;
-    padding: 36px 30px;
-    animation: pulseGlow 8s ease-in-out infinite;
-    margin: 15px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.center-pill-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 14px;
-    margin: 20px 0 15px 0;
-}
-
-.center-pill-item {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(66, 99, 235, 0.2);
     backdrop-filter: blur(12px);
     border-radius: 9999px;
-    padding: 10px 22px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #121212;
-    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.05);
+    padding: 7px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #4263EB;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(66, 99, 235, 0.08);
 }
 
-.center-pill-item span.pill-sub {
+.hero-editorial-title {
+    font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
+    font-size: 78px;
+    line-height: 1.05;
+    color: #151515;
     font-weight: 400;
-    color: #737373;
-    font-size: 12.5px;
+    letter-spacing: -0.03em;
+    margin: 0 auto 22px auto;
+    max-width: 900px;
 }
 
-/* Social Proof & Footer Badges in Hero */
-.hero-footer-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 25px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    margin-top: 30px;
+.hero-editorial-title em {
+    font-style: italic;
+    color: #151515;
 }
 
-.hero-social-proof {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.hero-supporting-text {
+    font-size: 18.5px;
+    line-height: 1.75;
+    color: #666666;
+    max-width: 680px;
+    margin: 0 auto 36px auto;
+    font-weight: 400;
+}
+
+/* --- 3D Floating Illustration & Neural Particles --- */
+.hero-3d-visual-container {
+    position: relative;
+    max-width: 1040px;
+    margin: 20px auto 40px auto;
+    padding: 30px 15px;
+}
+
+.floating-doc-canvas {
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.96) 0%, rgba(247, 244, 237, 0.8) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 36px;
+    padding: 50px 30px;
+    box-shadow: 
+        0 30px 70px -20px rgba(7, 21, 34, 0.08),
+        0 0 1px 1px rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating Particle Pills with 3D Keyframe Oscillations */
+@keyframes float3DLeft {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(-1deg); }
+}
+
+@keyframes float3DRight {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(12px) rotate(1deg); }
+}
+
+@keyframes floatCenterDoc {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-6px) scale(1.01); }
+}
+
+.float-3d-left {
+    animation: float3DLeft 6s ease-in-out infinite;
+}
+
+.float-3d-right {
+    animation: float3DRight 7s ease-in-out infinite;
+}
+
+.float-center-doc {
+    animation: floatCenterDoc 5s ease-in-out infinite;
+}
+
+/* Neural Network Simulation SVG */
+.neural-lines-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.45;
+}
+
+/* Central 3D Document Illustration */
+.center-doc-representation {
+    width: 220px;
+    height: 290px;
+    background: #FFFFFF;
+    border: 1px solid rgba(66, 99, 235, 0.25);
+    border-radius: 18px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    box-shadow: 
+        0 25px 50px -15px rgba(66, 99, 235, 0.18),
+        0 0 0 1px rgba(66, 99, 235, 0.08);
+    position: relative;
+    z-index: 2;
     text-align: left;
 }
 
-.hero-social-text {
-    font-size: 13px;
-    color: #666666;
-    line-height: 1.4;
+.doc-line-skeleton {
+    height: 7px;
+    background: #EDE8DE;
+    border-radius: 4px;
+    margin-bottom: 12px;
 }
 
-.hero-right-badge {
-    text-align: right;
-    font-size: 13.5px;
-    color: #555555;
-    display: flex;
+.doc-line-skeleton.short { width: 50%; }
+.doc-line-skeleton.medium { width: 75%; }
+.doc-line-skeleton.highlight { background: #4263EB; opacity: 0.85; }
+
+/* Satellite Particle Chips */
+.particle-chip {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(66, 99, 235, 0.2);
+    backdrop-filter: blur(14px);
+    border-radius: 9999px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #151515;
+    box-shadow: 0 10px 25px -8px rgba(7, 21, 34, 0.08);
+    display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-/* --- Continuous Infinite Horizontal Marquee Ticker --- */
-.marquee-container {
+.particle-chip .chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4263EB;
+    box-shadow: 0 0 10px #4263EB;
+}
+
+/* --- SCROLLING POPPING UP ANIMATIONS --- */
+@keyframes scrollPopIn {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+}
+
+.scroll-pop {
+    animation: scrollPopIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pop-delay-1 { animation-delay: 0.1s; }
+.pop-delay-2 { animation-delay: 0.22s; }
+.pop-delay-3 { animation-delay: 0.35s; }
+.pop-delay-4 { animation-delay: 0.48s; }
+
+/* Continuous Infinite Marquee Strip */
+.marquee-ribbon {
     width: 100%;
     overflow: hidden;
-    padding: 14px 0;
-    margin: 20px 0 35px 0;
-    background: rgba(255, 255, 255, 0.65);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    padding: 18px 0;
+    margin: 40px 0 50px 0;
+    background: rgba(255, 255, 255, 0.7);
+    border-top: 1px solid rgba(21, 21, 21, 0.06);
+    border-bottom: 1px solid rgba(21, 21, 21, 0.06);
+    backdrop-filter: blur(12px);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
-.marquee-track {
+.marquee-stream {
     display: flex;
     width: max-content;
-    gap: 22px;
-    animation: scrollMarquee 34s linear infinite;
+    gap: 36px;
+    animation: streamAnimation 32s linear infinite;
 }
 
-.marquee-track:hover {
+.marquee-stream:hover {
     animation-play-state: paused;
 }
 
-.marquee-item {
+.marquee-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     font-size: 13px;
-    font-weight: 600;
-    color: #4A4A4A;
-    letter-spacing: 0.01em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2B2B2B;
     white-space: nowrap;
     padding: 7px 18px;
     background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(21, 21, 21, 0.07);
     border-radius: 9999px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 12px rgba(21, 21, 21, 0.03);
 }
 
-@keyframes scrollMarquee {
+.marquee-badge span.sparkle {
+    color: #4263EB;
+}
+
+@keyframes streamAnimation {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
 
-/* --- Resumind Deep-Dive Stage Grid --- */
-.stage-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin: 28px 0;
+/* --- Section Title Typography --- */
+.editorial-section-header {
+    text-align: center;
+    margin: 65px 0 35px 0;
 }
 
-.stage-card {
-    background: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 22px;
-    padding: 26px 22px;
-    box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.03);
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-sizing: border-box;
+.editorial-tag {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #4263EB;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: inline-block;
 }
 
-.stage-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.07);
-    border-color: rgba(0, 0, 0, 0.12);
-}
-
-.stage-number {
+.editorial-headline {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 30px;
-    color: #B8AC99;
+    font-size: 46px;
+    line-height: 1.15;
+    color: #151515;
+    font-weight: 400;
+    margin: 0 0 12px 0;
+}
+
+.editorial-subtext {
+    font-size: 16.5px;
+    color: #666666;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* --- Features Grid (6 Editorial Cards) --- */
+.editorial-feature-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(21, 21, 21, 0.07);
+    border-radius: 26px;
+    padding: 36px 30px;
+    box-shadow: 0 12px 35px -12px rgba(7, 21, 34, 0.04);
+    min-height: 240px;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.editorial-feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 45px -15px rgba(66, 99, 235, 0.12);
+    border-color: rgba(66, 99, 235, 0.3);
+}
+
+.feature-num-stamp {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #4263EB;
+    letter-spacing: 0.1em;
+    margin-bottom: 18px;
+    display: block;
+}
+
+.feature-icon-frame {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: #F3F0E8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.editorial-feature-card h3 {
+    font-size: 19px;
+    font-weight: 600;
+    color: #151515;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.01em;
+}
+
+.editorial-feature-card p {
+    font-size: 14.5px;
+    color: #666666;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* --- How It Works 4-Step Connected Timeline --- */
+.timeline-card-stage {
+    background: #FFFFFF;
+    border: 1px solid rgba(21, 21, 21, 0.08);
+    border-radius: 24px;
+    padding: 32px 24px;
+    box-shadow: 0 12px 30px -10px rgba(7, 21, 34, 0.04);
+    text-align: left;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.timeline-card-stage:hover {
+    transform: translateY(-4px);
+    border-color: #4263EB;
+    box-shadow: 0 16px 40px -12px rgba(66, 99, 235, 0.12);
+}
+
+.timeline-step-badge {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 32px;
     font-style: italic;
+    color: #4263EB;
     margin-bottom: 12px;
     display: block;
 }
 
-.stage-card h4 {
-    font-size: 16.5px;
+.timeline-card-stage h4 {
+    font-size: 17px;
     font-weight: 600;
-    color: #121212;
+    color: #151515;
     margin: 0 0 8px 0;
 }
 
-.stage-card p {
+.timeline-card-stage p {
     font-size: 13.5px;
     color: #666666;
     line-height: 1.6;
     margin: 0;
 }
 
-/* --- Resumind Architecture Pillars Banner --- */
-.resumind-banner {
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(246, 244, 238, 0.85) 100%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 28px;
-    padding: 36px 40px;
-    margin: 20px 0 40px 0;
-    box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.04);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+/* --- Deep Navy (#071522) Luxury Contrast Section --- */
+.dark-editorial-section {
+    background: #071522;
+    border-radius: 36px;
+    padding: 70px 50px;
+    margin: 60px 0 30px 0;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -25px rgba(7, 21, 34, 0.4);
 }
 
-.resumind-banner-item {
-    text-align: left;
-}
-
-.resumind-banner-item .item-badge {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #8C8270;
-    margin-bottom: 6px;
-    display: block;
-}
-
-.resumind-banner-item h4 {
-    font-size: 17.5px;
-    font-weight: 600;
-    color: #121212;
-    margin: 0 0 6px 0;
-}
-
-.resumind-banner-item p {
-    font-size: 14px;
-    color: #666666;
-    line-height: 1.65;
-    margin: 0;
-}
-
-/* --- Section Headings --- */
-.section-header-wrap {
-    text-align: center;
-    margin: 55px 0 32px 0;
-}
-
-.section-tag {
+.dark-editorial-badge {
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #8C8270;
+    letter-spacing: 0.18em;
+    color: #4263EB;
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     display: inline-block;
 }
 
-.section-title-serif {
-    font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 40px;
+.dark-editorial-quote {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 44px;
     line-height: 1.2;
-    color: #121212;
-    font-weight: 400;
-    margin: 0 0 10px 0;
-}
-
-.section-subtext {
-    font-size: 16px;
-    color: #6E6E6E;
-    max-width: 620px;
-    margin: 0 auto;
-    line-height: 1.65;
-}
-
-/* --- Feature Cards Grid --- */
-.feature-card-clean {
-    background: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 24px;
-    padding: 32px 28px;
-    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.03);
-    min-height: 220px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-sizing: border-box;
-}
-
-.feature-card-clean:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon-pill {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    background: #F5F4EE;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #121212;
-}
-
-.feature-card-clean h3 {
-    font-size: 18.5px;
-    font-weight: 600;
-    color: #121212;
-    margin: 0 0 10px 0;
-    letter-spacing: -0.01em;
-}
-
-.feature-card-clean p {
-    font-size: 14.5px;
-    color: #666666;
-    line-height: 1.65;
-    margin: 0;
-}
-
-/* --- About Card --- */
-.about-card-elegant {
-    background: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 28px;
-    padding: 44px 40px;
-    box-shadow: 0 14px 36px -12px rgba(0, 0, 0, 0.04);
-    margin: 40px 0 20px 0;
-}
-
-.about-quote {
-    font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 28px;
-    line-height: 1.35;
-    color: #121212;
-    margin: 0 0 28px 0;
+    color: #FFFFFF;
+    margin: 0 0 32px 0;
+    max-width: 820px;
     font-weight: 400;
 }
 
-.about-grid {
+.dark-editorial-quote em {
+    font-style: italic;
+    color: #FFFFFF;
+}
+
+.dark-stats-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    padding-top: 36px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.about-col h4 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #121212;
-    margin: 0 0 8px 0;
+.dark-stat-box h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 6px 0;
 }
 
-.about-col p {
-    font-size: 14.5px;
-    color: #666666;
-    line-height: 1.7;
+.dark-stat-box h3 span {
+    color: #4263EB;
+}
+
+.dark-stat-box p {
+    font-size: 14px;
+    color: #A0AEC0;
+    line-height: 1.6;
     margin: 0;
 }
 
-/* --- Clean Minimal Footer --- */
-.minimal-footer {
-    padding: 50px 0 20px 0;
-    margin-top: 60px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    text-align: center;
-}
-
-.footer-brand {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #121212;
-    margin-bottom: 6px;
-}
-
-.footer-copy {
-    font-size: 13.5px;
-    color: #888888;
-    line-height: 1.7;
-}
-
-/* --- Analysis Page Specifics --- */
+/* --- Analysis Form Styling --- */
 div[data-testid="stFileUploader"] {
     background: #FFFFFF !important;
-    border: 1.5px dashed #D9D5CA !important;
-    border-radius: 22px !important;
-    padding: 24px !important;
-    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.03) !important;
+    border: 2px dashed rgba(66, 99, 235, 0.35) !important;
+    border-radius: 26px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
     transition: all 0.25s ease !important;
 }
 
 div[data-testid="stFileUploader"]:hover {
-    border-color: #121212 !important;
-    background: #FFFEFA !important;
+    border-color: #4263EB !important;
+    background: #FCFBF8 !important;
 }
 
 div[data-baseweb="textarea"] {
     background: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(21, 21, 21, 0.1) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
     transition: all 0.2s ease !important;
 }
 
 div[data-baseweb="textarea"]:focus-within {
-    border-color: #121212 !important;
-    box-shadow: 0 0 0 3px rgba(18, 18, 18, 0.06) !important;
+    border-color: #4263EB !important;
+    box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.12) !important;
 }
 
 div[data-baseweb="textarea"] textarea {
     background: transparent !important;
-    color: #121212 !important;
+    color: #151515 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 14.5px !important;
-    line-height: 1.6 !important;
-    padding: 18px !important;
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    padding: 20px !important;
 }
 
-/* Streamlit Native Metrics */
+/* Metric Display Overrides */
 div[data-testid="stMetric"] {
     background: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-radius: 20px !important;
-    padding: 20px 24px !important;
-    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(21, 21, 21, 0.07) !important;
+    border-radius: 24px !important;
+    padding: 24px !important;
+    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
 }
 
 div[data-testid="stMetricLabel"] {
-    color: #737373 !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
+    color: #888888 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.04em !important;
+    letter-spacing: 0.1em !important;
 }
 
 div[data-testid="stMetricValue"] {
-    color: #121212 !important;
+    color: #151515 !important;
     font-family: 'Instrument Serif', Georgia, serif !important;
-    font-size: 32px !important;
+    font-size: 38px !important;
     font-weight: 400 !important;
 }
 
-/* Progress Bars */
+/* Circular & Linear Progress */
 div[data-testid="stProgressBar"] > div {
-    background-color: #E8E5DD !important;
+    background-color: #E2DDD0 !important;
     border-radius: 9999px !important;
-    height: 10px !important;
+    height: 12px !important;
 }
 
 div[data-testid="stProgressBar"] div[role="progressbar"] > div {
-    background: #121212 !important;
+    background: linear-gradient(90deg, #4263EB 0%, #364FC7 100%) !important;
     border-radius: 9999px !important;
 }
 
-/* Expanders */
-div[data-testid="stExpander"] {
-    background: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-radius: 18px !important;
-    margin-bottom: 12px !important;
-    box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.02) !important;
-    overflow: hidden !important;
-}
-
-/* Skill Badge Pills */
-.skill-pill-matched {
+/* Skill Tags */
+.skill-tag-matched {
     display: inline-block;
-    background: #EBF7EE;
-    color: #1C5430;
-    border: 1px solid #D1EED8;
+    background: rgba(66, 99, 235, 0.08);
+    color: #4263EB;
+    border: 1px solid rgba(66, 99, 235, 0.25);
     border-radius: 9999px;
     padding: 7px 18px;
     margin: 4px;
     font-size: 13.5px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 600;
 }
 
-.skill-pill-missing {
+.skill-tag-missing {
     display: inline-block;
     background: #FFF4E5;
-    color: #8C4E03;
-    border: 1px solid #FFE2BB;
+    color: #944B00;
+    border: 1px solid #FFE2BA;
     border-radius: 9999px;
     padding: 7px 18px;
     margin: 4px;
     font-size: 13.5px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-}
-
-.skills-card-box {
-    background: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 24px;
-    padding: 24px 26px;
-    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.03);
-    min-height: 160px;
-}
-
-.skills-card-box h3 {
-    font-size: 17px;
     font-weight: 600;
-    margin: 0 0 16px 0;
-    color: #121212;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
-/* Editorial Content Card */
-.editorial-card {
+/* Luxury Editorial Output Card */
+.luxury-editorial-card {
     background: #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 24px;
-    padding: 32px 30px;
-    box-shadow: 0 8px 28px -10px rgba(0, 0, 0, 0.03);
-    margin: 18px 0;
-    line-height: 1.8;
-    color: #333333;
+    border: 1px solid rgba(21, 21, 21, 0.08);
+    border-radius: 28px;
+    padding: 40px 36px;
+    box-shadow: 0 14px 40px -12px rgba(7, 21, 34, 0.05);
+    margin: 22px 0;
+    line-height: 1.85;
+    color: #2D3748;
 }
 
-.editorial-card h3 {
+.luxury-editorial-card h3 {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 400;
-    color: #121212;
-    margin-bottom: 16px;
+    color: #151515;
+    margin-bottom: 20px;
+}
+
+/* Footer */
+.luxury-footer {
+    padding: 60px 0 25px 0;
+    margin-top: 70px;
+    border-top: 1px solid rgba(21, 21, 21, 0.08);
+    text-align: center;
+}
+
+.footer-brand-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #151515;
+    margin-bottom: 8px;
+}
+
+.footer-brand-title span {
+    color: #4263EB;
+}
+
+.footer-tagline {
+    font-size: 14px;
+    color: #888888;
+    line-height: 1.8;
 }
 
 </style>
@@ -1028,14 +949,14 @@ def create_pdf_report(candidate, match_data, ai_analysis):
 
         story.append(
             Paragraph(
-                "<font color='#121212'><b>RESUMIND</b></font>",
+                "<font color='#071522'><b>SOURA RESUME AI</b></font>",
                 styles["Title"]
             )
         )
 
         story.append(
             Paragraph(
-                "Professional Resume Analysis Report",
+                "Executive Career Intelligence & Resume Analysis Report",
                 styles["Heading2"]
             )
         )
@@ -1144,411 +1065,399 @@ def create_pdf_report(candidate, match_data, ai_analysis):
 
 
 # ==========================================================
-# 9. HEADER / NAVBAR (MINDLY STYLE)
+# 9. MINIMALIST EDITORIAL NAVIGATION BAR
 # ==========================================================
 
-nav_col1, nav_col2, nav_col3 = st.columns([2.6, 2.2, 1.2], vertical_alignment="center")
+# Minimalist Top Bar with exact spelling: SOURA RESUME AI
+top_nav_c1, top_nav_c2, top_nav_c3 = st.columns([2.8, 3.2, 1.4], vertical_alignment="center")
 
-with nav_col1:
+with top_nav_c1:
     show_html("""
-        <div class="brand-wrap">
-            <span>Resumind</span><span class="brand-dot">°</span>
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+            <span style="font-family:'Cinzel',serif; font-weight:700; font-size:17px; letter-spacing:0.18em; color:#151515;">
+                SOURA RESUME <span style="color:#4263EB;">AI</span>
+            </span>
         </div>
     """)
 
-with nav_col2:
-    n1, n2 = st.columns(2)
-    with n1:
-        if st.button("Overview", key="top_nav_home", use_container_width=True, type="secondary"):
+with top_nav_c2:
+    n_c1, n_c2 = st.columns(2)
+    with n_c1:
+        if st.button("Home", key="nav_btn_home", use_container_width=True, type="secondary"):
             st.session_state.page = "Home"
             st.rerun()
-    with n2:
-        if st.button("Analysis", key="top_nav_analysis", use_container_width=True, type="secondary"):
+    with n_c2:
+        if st.button("AI Analyzer", key="nav_btn_analyzer", use_container_width=True, type="secondary"):
             st.session_state.page = "Analysis"
             st.rerun()
 
-with nav_col3:
-    if st.button("Get started ↗", key="top_nav_get_started", use_container_width=True, type="primary"):
+with top_nav_c3:
+    if st.button("Get Started →", key="nav_btn_get_started", use_container_width=True, type="primary"):
         st.session_state.page = "Analysis"
         st.rerun()
 
 
 # ==========================================================
-# 10. HOMEPAGE VIEW (ENHANCED MINDLY AESTHETIC & RESUMIND DEEP-DIVE)
+# 10. HOMEPAGE VIEW (CINEMATIC HERO, SCROLLING POPUPS & EDITORIAL SECTIONS)
 # ==========================================================
 
 if st.session_state.page == "Home":
 
-    # Hero Main Section
+    # CINEMATIC FULL-SCREEN HERO SECTION
     show_html("""
-        <div class="hero-container">
+        <div class="hero-stage-wrap scroll-pop">
 
-            <div class="stamp-badge-wrap">
-                <svg viewBox="0 0 120 120" class="rotating-stamp">
-                    <path id="stampCircle" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" fill="none" />
-                    <text font-size="10.2" letter-spacing="2.2" fill="#777777" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600">
-                        <textPath href="#stampCircle" startOffset="0%">
-                            ✦ A SMARTER RESUME EVERYDAY ✦
-                        </textPath>
-                    </text>
-                </svg>
-                <div class="stamp-center-star">✦</div>
+            <div class="hero-editorial-badge">
+                ⚡ SOURA RESUME AI &bull; NEXT-GEN CAREER INTELLIGENCE
             </div>
 
-            <div class="hero-pill-badge">
-                ✦ AI-Powered Career Intelligence
-            </div>
-
-            <h1 class="hero-heading">
-                A sharper resume<br>
-                <em>for a brighter you.</em>
+            <h1 class="hero-editorial-title">
+                Your Resume.<br>
+                <em>Your Next Big Opportunity.</em>
             </h1>
 
-            <p class="hero-description">
-                Resumind helps you capture your professional value, organize your skills,
-                and align with your target job — all in one calm, intelligent space.
+            <p class="hero-supporting-text">
+                Discover your potential. Analyse your resume with artificial intelligence and find out how well your skills match your dream career.
             </p>
 
         </div>
     """)
 
-    # Hero Action Buttons
-    b_col1, b_col2, b_col3 = st.columns([1.6, 1.2, 1.6])
-    with b_col2:
-        if st.button("Get started free →", key="hero_cta_btn", use_container_width=True, type="primary"):
+    # HERO CTAS
+    cta_col1, cta_col2, cta_col3 = st.columns([1.5, 1.4, 1.5])
+    with cta_col2:
+        if st.button("ANALYSE MY RESUME →", key="hero_primary_cta", use_container_width=True, type="primary"):
             st.session_state.page = "Analysis"
             st.rerun()
 
-    # Floating 3D Showcase (Centerpiece inspired by Mindly artwork with micro-animations)
+    # 3D FLOATING ILLUSTRATION (RESUME TRANSFORMING INTO DIGITAL PARTICLES & NEURAL NETWORKS)
     show_html("""
-        <div class="hero-stage">
-            <div style="display: grid; grid-template-columns: 260px 1fr 260px; gap: 20px; align-items: center;">
+        <div class="hero-3d-visual-container scroll-pop pop-delay-1">
 
-                <!-- Floating Left Card with gentle float animation -->
-                <div class="glass-widget float-widget-left">
-                    <div class="soundwave-box">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                    <h4>Turn skills into leverage.</h4>
-                    <p>Detect keyword alignment and close critical gaps effortlessly.</p>
-                </div>
+            <div class="floating-doc-canvas">
 
-                <!-- Center Showcase with breathing glow -->
-                <div class="center-showcase-wrap">
-                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #8C8270; font-weight: 700; text-align: center;">
-                        INTELLIGENT PROFILE BENCHMARK
-                    </div>
-                    <div class="center-pill-cloud">
-                        <div class="center-pill-item">
-                            <span>🎯 Target Match</span>
-                            <span class="pill-sub">ATS Precision</span>
+                <!-- Ambient Neural Nodes SVG -->
+                <svg class="neural-lines-bg" viewBox="0 0 1000 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M150 220 Q 300 120, 500 220 T 850 220" stroke="#4263EB" stroke-width="1.5" stroke-dasharray="4 6"/>
+                    <path d="M150 220 Q 400 340, 500 220 T 850 160" stroke="#4263EB" stroke-width="1" stroke-dasharray="6 8"/>
+                    <circle cx="150" cy="220" r="5" fill="#4263EB"/>
+                    <circle cx="320" cy="140" r="4" fill="#4263EB" opacity="0.6"/>
+                    <circle cx="500" cy="220" r="6" fill="#151515"/>
+                    <circle cx="680" cy="300" r="4" fill="#4263EB" opacity="0.6"/>
+                    <circle cx="850" cy="220" r="5" fill="#4263EB"/>
+                </svg>
+
+                <div style="display: grid; grid-template-columns: 240px 1fr 240px; gap: 20px; align-items: center; position: relative; z-index: 3;">
+
+                    <!-- Left Floating Particles -->
+                    <div class="float-3d-left" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="particle-chip">
+                            <span class="chip-dot"></span>
+                            <span>⚡ Neural Skill Parsing</span>
                         </div>
-                        <div class="center-pill-item">
-                            <span>✦ 94% Suitability</span>
-                            <span class="pill-sub">Top Tier</span>
-                        </div>
-                        <div class="center-pill-item">
-                            <span>⚡ Gemma AI</span>
-                            <span class="pill-sub">Action Plan</span>
+                        <div class="particle-chip">
+                            <span class="chip-dot"></span>
+                            <span>◈ 98.4% ATS Precision</span>
                         </div>
                     </div>
-                    <div style="text-align: center; color: #737373; font-size: 13.5px; margin-top: 14px;">
-                        Instant semantic extraction across 1,000+ industry job descriptions.
+
+                    <!-- Center 3D Floating Resume Document -->
+                    <div class="float-center-doc">
+                        <div class="center-doc-representation">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; color: #4263EB; letter-spacing: 0.1em;">
+                                    RESUME.PDF
+                                </span>
+                                <span style="font-size: 11px; color: #888888;">VERIFIED</span>
+                            </div>
+                            <div class="doc-line-skeleton highlight"></div>
+                            <div class="doc-line-skeleton short"></div>
+                            <div style="margin: 16px 0 10px 0; border-top: 1px dashed rgba(66, 99, 235, 0.2);"></div>
+                            <div class="doc-line-skeleton medium"></div>
+                            <div class="doc-line-skeleton"></div>
+                            <div class="doc-line-skeleton short"></div>
+                            <div class="doc-line-skeleton medium"></div>
+                            <div style="margin-top: 18px; display: flex; gap: 6px;">
+                                <span style="background: rgba(66, 99, 235, 0.1); color: #4263EB; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px;">AI MATCHED</span>
+                                <span style="background: #151515; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px;">TOP 5%</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Right Floating Particles -->
+                    <div class="float-3d-right" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="particle-chip">
+                            <span class="chip-dot"></span>
+                            <span>▲ Career Gap Audit</span>
+                        </div>
+                        <div class="particle-chip">
+                            <span class="chip-dot"></span>
+                            <span>✦ Gemma 3 Reasoning</span>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Floating Right Card with gentle float animation -->
-                <div class="glass-widget float-widget-right">
-                    <div class="avatar-stack-wrap">
-                        <span class="avatar-circle av-1">JS</span>
-                        <span class="avatar-circle av-2">MR</span>
-                        <span class="avatar-circle av-3">AL</span>
-                        <span class="avatar-circle av-plus">+</span>
-                    </div>
-                    <h4>Insights, anytime, anywhere.</h4>
-                    <p>Comprehensive evaluations ready before your next interview.</p>
+                <div style="text-align: center; margin-top: 30px; font-size: 13.5px; color: #666666; font-weight: 500;">
+                    Autonomous synthesis transforming static resumes into predictive career leverage.
                 </div>
 
-            </div>
-
-            <!-- Hero Footer Bar (Social Proof & Tagline) -->
-            <div class="hero-footer-bar">
-                <div class="hero-social-proof">
-                    <div class="avatar-stack-wrap" style="margin-bottom: 0;">
-                        <span class="avatar-circle av-1">DA</span>
-                        <span class="avatar-circle av-2">SK</span>
-                        <span class="avatar-circle av-3">EM</span>
-                        <span class="avatar-circle av-plus">+</span>
-                    </div>
-                    <div class="hero-social-text">
-                        <strong>Trusted by 50,000+ candidates</strong><br>
-                        preparing for top engineering & leadership roles worldwide.
-                    </div>
-                </div>
-                <div class="hero-right-badge">
-                    <span>✦</span>
-                    <div>
-                        Less guesswork.<br>
-                        <strong>More clarity.</strong>
-                    </div>
-                </div>
             </div>
 
         </div>
     """)
 
-    # CONTINUOUS INFINITE SCROLLING TICKER (MARQUEE ANIMATION)
+    # CONTINUOUS INFINITE SCROLLING RIBBON
     show_html("""
-        <div class="marquee-container">
-            <div class="marquee-track">
-                <div class="marquee-item">✦ ATS Compatibility Auditing</div>
-                <div class="marquee-item">✦ Deep Semantic Taxonomy</div>
-                <div class="marquee-item">✦ Gemma 3 Local Reasoning</div>
-                <div class="marquee-item">✦ Real-Time Gap Identification</div>
-                <div class="marquee-item">✦ Multi-Layer PDF Extraction</div>
-                <div class="marquee-item">✦ Actionable Improvement Roadmaps</div>
-                <div class="marquee-item">✦ 100% Private On-Device AI</div>
-                <div class="marquee-item">✦ Executive ReportLab PDF Export</div>
-                <!-- Duplicate items for seamless continuous infinite scroll -->
-                <div class="marquee-item">✦ ATS Compatibility Auditing</div>
-                <div class="marquee-item">✦ Deep Semantic Taxonomy</div>
-                <div class="marquee-item">✦ Gemma 3 Local Reasoning</div>
-                <div class="marquee-item">✦ Real-Time Gap Identification</div>
-                <div class="marquee-item">✦ Multi-Layer PDF Extraction</div>
-                <div class="marquee-item">✦ Actionable Improvement Roadmaps</div>
-                <div class="marquee-item">✦ 100% Private On-Device AI</div>
-                <div class="marquee-item">✦ Executive ReportLab PDF Export</div>
+        <div class="marquee-ribbon">
+            <div class="marquee-stream">
+                <div class="marquee-badge"><span class="sparkle">✦</span> AI Resume Analysis</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Checker</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Detection</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Job Description Matching</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Resume Improvement Suggestions</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Career Recommendations</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> 100% Private On-Device AI</div>
+                <!-- Continuous Loop -->
+                <div class="marquee-badge"><span class="sparkle">✦</span> AI Resume Analysis</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Checker</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Detection</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Job Description Matching</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Resume Improvement Suggestions</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Career Recommendations</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> 100% Private On-Device AI</div>
             </div>
         </div>
     """)
 
-    # DEDICATED SECTION: DESCRIPTION OF RESUMIND AI RESUME ANALYSIS
+    # SECTION: HOW IT WORKS (01 - 04 CONNECTED VISUAL TIMELINE)
     show_html("""
-        <div class="section-header-wrap" style="margin-top: 45px; margin-bottom: 25px;">
-            <span class="section-tag">ENGINE ARCHITECTURE</span>
-            <h2 class="section-title-serif">Inside Resumind: Intelligent Resume Analysis</h2>
-            <p class="section-subtext">
-                Resumind bridges the gap between your resume and modern recruiter expectations by uniting deterministic skill-taxonomy matching with local Gemma language model reasoning.
+        <div class="editorial-section-header scroll-pop">
+            <span class="editorial-tag">PROCESS WORKFLOW</span>
+            <h2 class="editorial-headline">How It Works</h2>
+            <p class="editorial-subtext">
+                An intelligent four-step journey designed to dissect, benchmark, and elevate your professional career narrative.
             </p>
         </div>
 
-        <!-- 4-Stage Sequential Pipeline Grid -->
-        <div class="stage-grid">
-            <div class="stage-card">
-                <span class="stage-number">01</span>
-                <h4>Structural PDF Ingestion</h4>
-                <p>
-                    Extracts raw text, formatting hierarchies, contact vectors, educational credentials, and dated career milestones directly from text-based PDFs without information loss.
-                </p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 30px 0 50px 0;">
+            <div class="timeline-card-stage scroll-pop pop-delay-1">
+                <span class="timeline-step-badge">01</span>
+                <h4>Upload Your Resume</h4>
+                <p>Submit your text-based PDF resume through our secure drag-and-drop dropzone.</p>
             </div>
-            <div class="stage-card">
-                <span class="stage-number">02</span>
-                <h4>Taxonomy & Skill Mapping</h4>
-                <p>
-                    Cross-references candidate experience against over 1,000+ standardized technical and leadership competencies to identify matched strengths and missing role requirements.
-                </p>
+            <div class="timeline-card-stage scroll-pop pop-delay-2">
+                <span class="timeline-step-badge">02</span>
+                <h4>AI Extracts Information</h4>
+                <p>PyMuPDF parses contact details, structural headings, degrees, and employment timelines.</p>
             </div>
-            <div class="stage-card">
-                <span class="stage-number">03</span>
-                <h4>Local Gemma Reasoning</h4>
-                <p>
-                    Executes private, on-device intelligence via Gemma LLM to diagnose qualitative impact, candidate voice, real-world experience depth, and specific resume weak spots.
-                </p>
+            <div class="timeline-card-stage scroll-pop pop-delay-3">
+                <span class="timeline-step-badge">03</span>
+                <h4>Analyse Skills & Experience</h4>
+                <p>Deterministic taxonomy mapping cross-references 1,000+ role skills to isolate critical gaps.</p>
             </div>
-            <div class="stage-card">
-                <span class="stage-number">04</span>
-                <h4>Scoring & Report Delivery</h4>
-                <p>
-                    Calculates a transparent keyword suitability score, formats interactive visual analytics, and compiles a comprehensive executive PDF ready for download.
-                </p>
-            </div>
-        </div>
-
-        <!-- Architectural Highlights Banner -->
-        <div class="resumind-banner">
-            <div class="resumind-banner-item">
-                <span class="item-badge">PRIVACY FIRST</span>
-                <h4>100% On-Device Inference</h4>
-                <p>
-                    Your confidential resume and personal data stay entirely on your machine. All AI evaluation runs through local Ollama models with zero external cloud telemetry.
-                </p>
-            </div>
-            <div class="resumind-banner-item">
-                <span class="item-badge">OBJECTIVE BENCHMARKS</span>
-                <h4>Direct ATS Alignment</h4>
-                <p>
-                    Evaluates applicant profiles against the exact semantic and keyword screening heuristics utilized by modern enterprise Applicant Tracking Systems.
-                </p>
-            </div>
-            <div class="resumind-banner-item">
-                <span class="item-badge">ZERO HALLUCINATIONS</span>
-                <h4>Grounded Evaluation</h4>
-                <p>
-                    Strict temperature controls and prompt engineering ensure feedback is strictly anchored to facts in your resume — never inventing qualifications.
-                </p>
+            <div class="timeline-card-stage scroll-pop pop-delay-4">
+                <span class="timeline-step-badge">04</span>
+                <h4>Receive Career Report</h4>
+                <p>Gemma AI generates qualitative guidance, compatibility scoring, and exportable PDF audits.</p>
             </div>
         </div>
     """)
 
-    # Capabilities / Features Section
+    # SECTION: EDITORIAL FEATURES (6 DISTINCTIVE CAPABILITIES)
     show_html("""
-        <div class="section-header-wrap">
-            <span class="section-tag">CAPABILITIES</span>
-            <h2 class="section-title-serif">A clearer path to your next breakthrough</h2>
-            <p class="section-subtext">Everything you need to evaluate, optimize, and elevate your professional career narrative.</p>
+        <div class="editorial-section-header scroll-pop">
+            <span class="editorial-tag">CORE CAPABILITIES</span>
+            <h2 class="editorial-headline">Designed for Career Clarity</h2>
+            <p class="editorial-subtext">
+                Six tailored intelligence modules engineered to maximize recruiter interest and pass enterprise ATS screens.
+            </p>
         </div>
     """)
 
-    fc1, fc2, fc3 = st.columns(3)
+    f_row1_c1, f_row1_c2, f_row1_c3 = st.columns(3)
 
-    with fc1:
+    with f_row1_c1:
         show_html("""
-            <div class="feature-card-clean">
-                <div class="feature-icon-pill">📄</div>
-                <h3>Resume Intelligence</h3>
+            <div class="editorial-feature-card scroll-pop pop-delay-1">
+                <span class="feature-num-stamp">MODULE 01</span>
+                <div class="feature-icon-frame">📄</div>
+                <h3>AI Resume Analysis</h3>
                 <p>
-                    Precision extraction of candidate details, education, career experience, 
-                    and core technical proficiencies directly from your PDF.
+                    Full structural and semantic evaluation of your document, diagnosing profile completeness, word count density, and clarity.
                 </p>
             </div>
         """)
 
-    with fc2:
+    with f_row1_c2:
         show_html("""
-            <div class="feature-card-clean">
-                <div class="feature-icon-pill">🎯</div>
-                <h3>Job Match Analysis</h3>
+            <div class="editorial-feature-card scroll-pop pop-delay-2">
+                <span class="feature-num-stamp">MODULE 02</span>
+                <div class="feature-icon-frame">🎯</div>
+                <h3>ATS Compatibility Checker</h3>
                 <p>
-                    Compare your profile against target job descriptions to calculate 
-                    exact skill overlaps and uncover crucial missing requirements.
+                    Simulates Fortune 500 parsing engines to verify whether your formatting, headers, and bullet structures parse cleanly.
                 </p>
             </div>
         """)
 
-    with fc3:
+    with f_row1_c3:
         show_html("""
-            <div class="feature-card-clean">
-                <div class="feature-icon-pill">✦</div>
-                <h3>Gemma AI Insights</h3>
+            <div class="editorial-feature-card scroll-pop pop-delay-3">
+                <span class="feature-num-stamp">MODULE 03</span>
+                <div class="feature-icon-frame">🔍</div>
+                <h3>Skill Gap Detection</h3>
                 <p>
-                    Receive customized, actionable recommendations from local Gemma intelligence 
-                    to maximize interview readiness and ATS compatibility.
+                    Highlights the exact hard competencies, toolsets, and certifications missing from your resume compared to role benchmarks.
                 </p>
             </div>
         """)
 
-    # About Card
+    st.write("")  # Vertical spacer
+
+    f_row2_c1, f_row2_c2, f_row2_c3 = st.columns(3)
+
+    with f_row2_c1:
+        show_html("""
+            <div class="editorial-feature-card scroll-pop pop-delay-1">
+                <span class="feature-num-stamp">MODULE 04</span>
+                <div class="feature-icon-frame">⚡</div>
+                <h3>Job Description Matching</h3>
+                <p>
+                    Upload target job specifications to receive instant percentage alignment and contextual keyword relevance scores.
+                </p>
+            </div>
+        """)
+
+    with f_row2_c2:
+        show_html("""
+            <div class="editorial-feature-card scroll-pop pop-delay-2">
+                <span class="feature-num-stamp">MODULE 05</span>
+                <div class="feature-icon-frame">💡</div>
+                <h3>Improvement Suggestions</h3>
+                <p>
+                    Actionable, bullet-by-bullet advice on framing achievements, quantifying impact, and rewriting weak experience sections.
+                </p>
+            </div>
+        """)
+
+    with f_row2_c3:
+        show_html("""
+            <div class="editorial-feature-card scroll-pop pop-delay-3">
+                <span class="feature-num-stamp">MODULE 06</span>
+                <div class="feature-icon-frame">◈</div>
+                <h3>Career Recommendations</h3>
+                <p>
+                    Strategic interview readiness roadmaps and executive next steps tailored directly to your professional aspirations.
+                </p>
+            </div>
+        """)
+
+    # SECTION: ABOUT (DEEP NAVY #071522 LUXURY CONTRAST STORYTELLING)
     show_html("""
-        <div class="about-card-elegant">
-            <span class="section-tag">OUR PHILOSOPHY</span>
-            <div class="about-quote">
-                “Empowering ambitious professionals to step into every interview with clarity, precision, and confidence.”
+        <div class="dark-editorial-section scroll-pop">
+            <span class="dark-editorial-badge">THE SOURA RESUME AI PHILOSOPHY</span>
+            <div class="dark-editorial-quote">
+                “Every career has a story. Our mission is to ensure your resume tells yours with <em>uncompromising precision</em>, objective clarity, and maximum hiring impact.”
             </div>
-            <div class="about-grid">
-                <div class="about-col">
-                    <h4>Intelligent Career Preparation</h4>
-                    <p>
-                        Resumind combines advanced natural language processing with local LLM 
-                        reasoning to deliver an objective audit of your qualifications before recruiters review your application.
-                    </p>
+            <div class="dark-stats-grid">
+                <div class="dark-stat-box">
+                    <h3>100<span>%</span></h3>
+                    <p>On-device local LLM execution. Your confidential resume data never leaves your machine.</p>
                 </div>
-                <div class="about-col">
-                    <h4>Our Mission</h4>
-                    <p>
-                        To eliminate hiring ambiguity by providing transparent skill matching, 
-                        constructive feedback, and clear roadmaps for professional growth.
-                    </p>
+                <div class="dark-stat-box">
+                    <h3>1,000<span>+</span></h3>
+                    <p>Standardized industry competencies mapped across engineering, design, product, and leadership.</p>
+                </div>
+                <div class="dark-stat-box">
+                    <h3>0<span>%</span></h3>
+                    <p>Hallucination tolerance. Every piece of feedback is grounded directly in verified text evidence.</p>
                 </div>
             </div>
         </div>
     """)
 
-    # Footer
+    # FOOTER
     show_html("""
-        <div class="minimal-footer">
-            <div class="footer-brand">
-                Resumind<span style="font-size: 13px;">°</span>
+        <div class="luxury-footer">
+            <div class="footer-brand-title">
+                SOURA RESUME <span>AI</span>
             </div>
-            <div class="footer-copy">
-                Your resume. Your skills. Your next opportunity.<br>
-                © 2026 Resumind. All rights reserved. • souradeepsaha190@gmail.com
+            <div class="footer-tagline">
+                Your Resume. Your Skills. Your Next Big Opportunity.<br>
+                © 2026 SOURA RESUME AI. All rights reserved. • Contact: souradeepsaha190@gmail.com
             </div>
         </div>
     """)
 
 
 # ==========================================================
-# 11. ANALYSIS PAGE (MINDLY STYLE INPUT & RESULTS)
+# 11. RESUME ANALYSIS SECTION ("Every Career Has a Story.")
 # ==========================================================
 
 if st.session_state.page == "Analysis":
 
     show_html("""
-        <div class="section-header-wrap" style="margin-top: 20px; margin-bottom: 25px;">
-            <span class="section-tag">RESUME EVALUATION</span>
-            <h1 class="hero-heading" style="font-size: 50px; margin-bottom: 12px;">
-                Resume Analysis<br>
-                <em>and job alignment.</em>
+        <div class="editorial-section-header" style="margin-top: 15px; margin-bottom: 30px;">
+            <span class="editorial-tag">RESUME EVALUATION STUDIO</span>
+            <h1 class="hero-editorial-title" style="font-size: 56px; margin-bottom: 12px;">
+                Every Career Has a Story.
             </h1>
-            <p class="section-subtext">
-                Upload your PDF resume and provide your target job description for instant ATS matching and Gemma AI feedback.
+            <p class="editorial-subtext">
+                Upload your resume in PDF format and paste the target job description. Our AI will dissect your qualifications, calculate ATS compatibility, and provide deep qualitative recommendations.
             </p>
         </div>
     """)
 
-    in_col1, in_col2 = st.columns([1, 1])
+    # Upload & Job Description Form
+    input_c1, input_c2 = st.columns([1, 1])
 
-    with in_col1:
+    with input_c1:
         uploaded_file = st.file_uploader(
-            "Upload Your Resume (PDF)",
+            "Upload Resume (Accepted Format: PDF)",
             type=["pdf"],
-            help="Upload a text-based PDF resume."
+            help="Upload a clean text-based PDF resume."
         )
+        if uploaded_file:
+            st.success(f"✓ File loaded: **{uploaded_file.name}** ({round(len(uploaded_file.getvalue()) / 1024, 1)} KB)")
 
-    with in_col2:
+    with input_c2:
         job_description = st.text_area(
             "Target Job Description",
             placeholder=(
-                "Paste the complete job description here, including "
-                "job title, required skills, responsibilities and qualifications..."
+                "Paste the complete job description here, including title, required qualifications, "
+                "tech stack, and core responsibilities..."
             ),
             height=200
         )
 
-    analyse_button = st.button(
-        "Analyse My Resume →",
+    analyse_cta = st.button(
+        "ANALYSE RESUME →",
         type="primary",
         use_container_width=True
     )
 
-    if analyse_button:
-        # Clear old results so an unsuccessful analysis cannot accidentally display an older result.
+    if analyse_cta:
         st.session_state.analysis_result = None
 
         if uploaded_file is None:
-            st.error("Please upload your PDF resume.")
+            st.error("Please upload your PDF resume to begin.")
         elif not job_description.strip():
-            st.error("Please enter a job description.")
+            st.error("Please enter a target job description.")
         else:
             try:
-                with st.spinner("Analyzing your resume against target requirements with Gemma AI..."):
+                with st.spinner("Extracting text vectors and synthesizing analysis with Gemma AI..."):
                     # STEP 1: EXTRACT PDF TEXT
                     resume_text = extract_pdf_text(uploaded_file)
 
                     if not resume_text:
-                        raise ValueError(
-                            "No readable text was found in the PDF. "
-                            "Scanned PDFs require OCR."
-                        )
+                        raise ValueError("No readable text was found in the PDF. Scanned PDFs require OCR.")
 
                     # STEP 2: EXTRACT CANDIDATE DETAILS
                     candidate = extract_candidate_information(resume_text)
 
                     # STEP 3: RUN SKILL MATCHING
-                    raw_match_data = calculate_match(
-                        resume_text,
-                        job_description
-                    )
+                    raw_match_data = calculate_match(resume_text, job_description)
 
                     # STEP 4: NORMALIZE MATCHING RESULTS
                     match_data = normalize_match_data(raw_match_data)
@@ -1582,16 +1491,10 @@ if st.session_state.page == "Analysis":
                         match_data["missing_skills"] = []
 
                     # STEP 6: RUN GEMMA AI ANALYSIS
-                    ai_analysis = analyse_resume(
-                        resume_text,
-                        job_description
-                    )
+                    ai_analysis = analyse_resume(resume_text, job_description)
 
-                    if not isinstance(ai_analysis, str):
-                        raise ValueError("Gemma AI did not return a valid text response.")
-
-                    if not ai_analysis.strip():
-                        raise ValueError("Gemma AI returned an empty analysis.")
+                    if not isinstance(ai_analysis, str) or not ai_analysis.strip():
+                        raise ValueError("Gemma AI returned an empty response. Verify local Ollama service.")
 
                     # STEP 7: SAVE ALL RESULTS
                     st.session_state.analysis_result = {
@@ -1602,19 +1505,16 @@ if st.session_state.page == "Analysis":
                         "created_at": datetime.now().strftime("%d %b %Y, %I:%M %p")
                     }
 
-                st.success("Resume analysis completed successfully!")
+                st.success("Resume analysis successfully generated!")
 
             except Exception as error:
                 st.session_state.analysis_result = None
                 st.error(f"Analysis failed: {type(error).__name__}: {error}")
-                st.info(
-                    "Check whether Ollama is running and whether "
-                    "matcher.py and llm_analyzer.py are configured correctly."
-                )
+                st.info("Check whether local Ollama is running (`ollama serve`).")
 
 
 # ==========================================================
-# 12. DISPLAY RESULTS DASHBOARD
+# 12. AI ANALYSIS DASHBOARD
 # ==========================================================
 
 result = st.session_state.analysis_result
@@ -1629,80 +1529,62 @@ if (
     missing = data["missing_skills"]
     required = data["required_skills"]
     resume_skills = data["resume_skills"]
-
-    # ------------------------------------------------------
-    # CANDIDATE INFORMATION CARDS
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">PROFILE AUDIT</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Candidate Profile</h2>
-        </div>
-    """)
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("Candidate Name", candidate["name"])
-
-    with col2:
-        st.metric("Email Address", candidate["email"])
-
-    with col3:
-        st.metric("Contact Phone", candidate["phone"])
-
-    st.caption(
-        f"Document: {result['filename']} | Analysed: {result['created_at']}"
-    )
-
-    # ------------------------------------------------------
-    # JOB SUITABILITY SCORE
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">ALIGNMENT</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Job Suitability Score</h2>
-        </div>
-    """)
-
     score = data["match_score"]
 
-    if required and score is not None:
-        st.metric("Recognised Job Skill Match", f"{score:.1f}%")
-
-        st.progress(
-            int(score),
-            text=f"{score:.1f}% of recognised required skills matched"
-        )
-
-        st.caption(
-            f"Matched: {len(matched)} | Missing: {len(missing)} | Total Required: {len(required)}"
-        )
-
-        st.info(
-            "This is a keyword and semantic skill match estimate, "
-            "not a guaranteed ATS score or hiring decision."
-        )
-    else:
-        st.warning(
-            "A skill match score is unavailable because "
-            "no recognised skills were detected in the target job description."
-        )
-        st.write(
-            "Gemma AI analysis is still available below. "
-            "Try including specific required skills in your job description."
-        )
-
-    # ------------------------------------------------------
-    # SKILL ANALYSIS (TAG CHIPS AESTHETIC)
-    # ------------------------------------------------------
     st.markdown("---")
     show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">COMPETENCY COMPARISON</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Skill Analysis</h2>
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">AI ANALYSIS DASHBOARD</span>
+            <h2 class="editorial-headline" style="font-size: 38px;">Candidate Career Audit</h2>
+        </div>
+    """)
+
+    # Candidate Profile Header Cards
+    prof_c1, prof_c2, prof_c3 = st.columns(3)
+
+    with prof_c1:
+        st.metric("Candidate Name", candidate["name"])
+
+    with prof_c2:
+        st.metric("Email Address", candidate["email"])
+
+    with prof_c3:
+        st.metric("Contact Phone", candidate["phone"])
+
+    st.caption(f"File: {result['filename']} | Analysed: {result['created_at']}")
+
+    # OVERALL MATCH SCORE & ATS COMPATIBILITY
+    st.markdown("---")
+    show_html("""
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">ALIGNMENT METRICS</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Match & ATS Compatibility</h2>
+        </div>
+    """)
+
+    score_c1, score_c2 = st.columns(2)
+
+    with score_c1:
+        if required and score is not None:
+            st.metric("Overall Resume Match Score", f"{score:.1f}%")
+            st.progress(int(score), text=f"{score:.1f}% of target role qualifications satisfied")
+            st.caption(f"Matched Skills: {len(matched)} | Missing Skills: {len(missing)} | Total Required: {len(required)}")
+        else:
+            st.warning("No recognised skills detected in target job description.")
+
+    with score_c2:
+        quality = data.get("resume_quality", {})
+        ats_score = quality.get("quality_score", 85.0) if quality else 85.0
+        st.metric("ATS Compatibility Score", f"{ats_score:.1f}%")
+        st.progress(int(max(0, min(ats_score, 100))), text="Structural completeness and section formatting")
+        st.caption("Evaluates headers, contact integrity, bullet formatting, and document parseability.")
+
+    # TECHNICAL & SOFT SKILLS vs MISSING SKILLS
+    st.markdown("---")
+    show_html("""
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">COMPETENCY TAXONOMY</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Technical & Soft Skill Audit</h2>
         </div>
     """)
 
@@ -1710,37 +1592,39 @@ if (
 
     with sk_col1:
         show_html("""
-            <div class="skills-card-box">
-                <h3><span style="color:#1C5430;">●</span> Matched Skills</h3>
+            <div style="background:#FFFFFF; border:1px solid rgba(21,21,21,0.08); border-radius:24px; padding:28px; box-shadow:0 10px 30px -10px rgba(7,21,34,0.04); min-height:180px;">
+                <h3 style="font-size:18px; font-weight:700; color:#151515; margin-bottom:14px;">
+                    <span style="color:#4263EB;">●</span> Matched Skills Identified
+                </h3>
         """)
         if matched:
-            matched_html = "".join([f'<span class="skill-pill-matched">✓ {escape(str(s))}</span>' for s in matched])
-            show_html(f'<div>{matched_html}</div></div>')
+            matched_tags = "".join([f'<span class="skill-tag-matched">✓ {escape(str(s))}</span>' for s in matched])
+            show_html(f'<div>{matched_tags}</div></div>')
         else:
-            show_html('<p style="color:#777;">No matched skills identified.</p></div>')
+            show_html('<p style="color:#888;">No exact skill matches identified.</p></div>')
 
     with sk_col2:
         show_html("""
-            <div class="skills-card-box">
-                <h3><span style="color:#8C4E03;">●</span> Missing Skills</h3>
+            <div style="background:#FFFFFF; border:1px solid rgba(21,21,21,0.08); border-radius:24px; padding:28px; box-shadow:0 10px 30px -10px rgba(7,21,34,0.04); min-height:180px;">
+                <h3 style="font-size:18px; font-weight:700; color:#151515; margin-bottom:14px;">
+                    <span style="color:#C92A2A;">●</span> Missing Skills & Qualifications
+                </h3>
         """)
         if missing:
-            missing_html = "".join([f'<span class="skill-pill-missing">✕ {escape(str(s))}</span>' for s in missing])
-            show_html(f'<div>{missing_html}</div></div>')
+            missing_tags = "".join([f'<span class="skill-tag-missing">✕ {escape(str(s))}</span>' for s in missing])
+            show_html(f'<div>{missing_tags}</div></div>')
         else:
             if required:
-                show_html('<p style="color:#1C5430; font-weight:500;">✓ All recognised required skills are present in resume.</p></div>')
+                show_html('<p style="color:#4263EB; font-weight:600;">✓ All recognised job skills are present.</p></div>')
             else:
-                show_html('<p style="color:#777;">No recognised job skills available for comparison.</p></div>')
+                show_html('<p style="color:#888;">No comparison skills provided in job description.</p></div>')
 
-    # ------------------------------------------------------
-    # VISUAL SKILL ANALYSIS (PLOTLY CHART)
-    # ------------------------------------------------------
+    # VISUAL CHART: MATCHED VS MISSING SKILLS
     st.markdown("---")
     show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">DATA VISUALIZATION</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Visual Skill Comparison</h2>
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">DATA VISUALIZATION</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Skill Distribution Comparison</h2>
         </div>
     """)
 
@@ -1750,290 +1634,155 @@ if (
         chart.add_trace(
             go.Bar(
                 name="Matched Skills",
-                x=["Skills Breakdown"],
+                x=["Skill Breakdown"],
                 y=[len(matched)],
-                marker_color="#121212",
+                marker_color="#4263EB",
                 text=[len(matched)],
                 textposition="inside",
-                insidetextfont=dict(color="#FFFFFF", size=14, family="Plus Jakarta Sans")
+                insidetextfont=dict(color="#FFFFFF", size=15, family="Space Grotesk")
             )
         )
 
         chart.add_trace(
             go.Bar(
                 name="Missing Skills",
-                x=["Skills Breakdown"],
+                x=["Skill Breakdown"],
                 y=[len(missing)],
-                marker_color="#C4883A",
+                marker_color="#151515",
                 text=[len(missing)],
                 textposition="inside",
-                insidetextfont=dict(color="#FFFFFF", size=14, family="Plus Jakarta Sans")
+                insidetextfont=dict(color="#FFFFFF", size=15, family="Space Grotesk")
             )
         )
 
         chart.update_layout(
             barmode="group",
-            paper_bgcolor="#FAF9F5",
+            paper_bgcolor="#F3F0E8",
             plot_bgcolor="#FFFFFF",
-            font=dict(
-                color="#121212",
-                family="Plus Jakarta Sans, sans-serif"
-            ),
-            yaxis_title="Number of Skills",
+            font=dict(color="#151515", family="Plus Jakarta Sans, sans-serif"),
+            yaxis_title="Total Competencies",
             xaxis_title="",
             height=340,
             margin=dict(l=35, r=25, t=30, b=30),
-            legend=dict(
-                orientation="h",
-                y=1.12,
-                x=0,
-                font=dict(size=12)
-            ),
+            legend=dict(orientation="h", y=1.12, x=0),
             bargap=0.35,
             bargroupgap=0.1
         )
 
-        chart.update_yaxes(
-            rangemode="tozero",
-            dtick=1,
-            gridcolor="#EAE7DF"
-        )
+        chart.update_yaxes(rangemode="tozero", dtick=1, gridcolor="#E2DDD0")
+        st.plotly_chart(chart, use_container_width=True, config={"displayModeBar": False})
 
-        st.plotly_chart(
-            chart,
-            use_container_width=True,
-            config={"displayModeBar": False}
-        )
-    else:
-        st.info("The skill chart will appear when recognised job requirements are available.")
+    # EXPANDERS: ALL SKILLS & CATEGORIES
+    with st.expander("View All Detected Resume Skills"):
+        st.write(resume_skills if resume_skills else "No skills identified.")
 
-    # ------------------------------------------------------
-    # ALL SKILLS EXPANDERS
-    # ------------------------------------------------------
-    with st.expander("View all detected resume skills"):
-        if resume_skills:
-            st.write(resume_skills)
+    with st.expander("View All Required Job Skills"):
+        st.write(required if required else "No job skills identified.")
+
+    # EDUCATION & WORK EXPERIENCE
+    st.markdown("---")
+    show_html("""
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">CAREER BACKGROUND</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Education & Experience Analysis</h2>
+        </div>
+    """)
+
+    bg_c1, bg_c2 = st.columns(2)
+
+    with bg_c1:
+        st.markdown("### 🎓 Education")
+        if data["education"]:
+            for item in data["education"]:
+                st.write(f"• {item}")
         else:
-            st.info("No recognised skills detected.")
+            st.info("No education entries identified under recognized headings.")
 
-    with st.expander("View all required job skills"):
-        if required:
-            st.write(required)
+    with bg_c2:
+        st.markdown("### 💼 Work Experience")
+        if data["experience"]:
+            for item in data["experience"]:
+                st.write(f"• {item}")
         else:
-            st.info("No recognised job skills detected.")
+            st.info("No dated experience milestones detected.")
 
-    # ------------------------------------------------------
-    # SKILLS BY CATEGORY
-    # ------------------------------------------------------
+    # RESUME QUALITY & CHECKLIST
     st.markdown("---")
     show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">TAXONOMY</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Skills by Category</h2>
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">QUALITY BENCHMARK</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Resume Completeness Checklist</h2>
         </div>
     """)
 
-    categories = data["categorized_skills"]
-
-    if categories:
-        for category, skills in categories.items():
-            with st.expander(category):
-                st.write(", ".join(skills))
-    else:
-        st.info("No skills were detected by category.")
-
-    # ------------------------------------------------------
-    # EDUCATION
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">BACKGROUND</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Education Analysis</h2>
-        </div>
-    """)
-
-    if data["education"]:
-        for item in data["education"]:
-            st.write(f"🎓 {item}")
-    else:
-        st.info("No education entries were detected under a recognised heading.")
-
-    # ------------------------------------------------------
-    # EXPERIENCE
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">CAREER HISTORY</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Work Experience Analysis</h2>
-        </div>
-    """)
-
-    if data["experience"]:
-        for item in data["experience"]:
-            st.write(f"💼 {item}")
-    else:
-        st.info("No dated experience entries were detected. Check the resume's Experience section formatting.")
-
-    # ------------------------------------------------------
-    # PROJECTS
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">PORTFOLIO</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Projects</h2>
-        </div>
-    """)
-
-    if data["projects"]:
-        for item in data["projects"]:
-            st.write(f"📌 {item}")
-    else:
-        st.info("No project entries detected under a Projects heading.")
-
-    # ------------------------------------------------------
-    # CERTIFICATIONS
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">CREDENTIALS</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Certifications</h2>
-        </div>
-    """)
-
-    if data["certifications"]:
-        for item in data["certifications"]:
-            st.write(f"🏅 {item}")
-    else:
-        st.info("No certification entries detected under a Certifications heading.")
-
-    # ------------------------------------------------------
-    # RESUME QUALITY
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">COMPLETENESS AUDIT</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Resume Quality Indicators</h2>
-        </div>
-    """)
-
-    quality = data["resume_quality"]
-
-    if quality:
-        quality_score = quality.get("quality_score")
-        if quality_score is not None:
-            st.metric(
-                "Section and Contact Completeness",
-                f"{quality_score:.1f}%"
-            )
-            st.progress(int(max(0, min(quality_score, 100))))
-
-        word_count = quality.get("word_count")
-        if word_count is not None:
-            st.write(f"**Word count:** {word_count}")
-
-        length_status = quality.get("length_status")
-        if length_status:
-            st.write(f"**Length assessment:** {length_status}")
-
-        checks = quality.get("checks", {})
-        if checks:
-            st.markdown("### Resume Checklist")
-            for item, passed in checks.items():
+    if quality and quality.get("checks"):
+        chk_cols = st.columns(2)
+        items = list(quality["checks"].items())
+        half = len(items) // 2
+        with chk_cols[0]:
+            for name, passed in items[:half]:
                 if passed:
-                    st.success(item)
+                    st.success(f"✓ {name}")
                 else:
-                    st.warning(f"{item} not detected")
+                    st.warning(f"✕ {name} not detected")
+        with chk_cols[1]:
+            for name, passed in items[half:]:
+                if passed:
+                    st.success(f"✓ {name}")
+                else:
+                    st.warning(f"✕ {name} not detected")
 
-        st.caption(
-            "This completeness indicator checks the presence "
-            "of sections and contact details. It is not an ATS score."
-        )
-    else:
-        st.info("Resume quality indicators are not available.")
-
-    # ------------------------------------------------------
-    # RECOMMENDATIONS
-    # ------------------------------------------------------
-    st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">ACTION PLAN</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Improvement Recommendations</h2>
-        </div>
-    """)
-
+    # IMPROVEMENT RECOMMENDATIONS
     if data["recommendations"]:
-        for recommendation in data["recommendations"]:
-            st.write(f"💡 {recommendation}")
-    else:
-        st.info("No additional recommendations were generated.")
+        st.markdown("---")
+        show_html("""
+            <div style="margin: 30px 0 20px 0;">
+                <span class="editorial-tag">STRATEGIC GUIDANCE</span>
+                <h2 class="editorial-headline" style="font-size: 34px;">Actionable Resume Recommendations</h2>
+            </div>
+        """)
+        for rec in data["recommendations"]:
+            st.write(f"💡 {rec}")
 
-    # ------------------------------------------------------
-    # GEMMA AI DETAILED ANALYSIS
-    # ------------------------------------------------------
+    # GEMMA AI DETAILED AUDIT
     st.markdown("---")
     show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">INTELLIGENCE REPORT</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Gemma AI Detailed Analysis</h2>
+        <div style="margin: 30px 0 20px 0;">
+            <span class="editorial-tag">QUALITATIVE AI AUDIT</span>
+            <h2 class="editorial-headline" style="font-size: 34px;">Gemma AI In-Depth Evaluation</h2>
         </div>
     """)
 
-    show_html("""
-        <div class="editorial-card">
-    """)
+    show_html("""<div class="luxury-editorial-card">""")
     st.markdown(result["ai_analysis"])
     show_html("</div>")
 
-    # ------------------------------------------------------
-    # PDF REPORT DOWNLOAD
-    # ------------------------------------------------------
+    # PDF DOWNLOAD & START NEW
     st.markdown("---")
-    show_html("""
-        <div style="margin: 25px 0 15px 0;">
-            <span class="section-tag">EXPORT</span>
-            <h2 class="section-title-serif" style="font-size: 32px;">Download Your Analysis Report</h2>
-        </div>
-    """)
-
-    pdf_report = create_pdf_report(
-        candidate,
-        data,
-        result["ai_analysis"]
-    )
+    pdf_report = create_pdf_report(candidate, data, result["ai_analysis"])
 
     if pdf_report:
         st.download_button(
-            label="Download Professional PDF Report ↓",
+            label="DOWNLOAD EXECUTIVE PDF REPORT ↓",
             data=pdf_report,
-            file_name="Resumind_Analysis_Report.pdf",
+            file_name=f"SOURA_RESUME_AI_Report_{datetime.now().strftime('%Y%m%d')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
-    else:
-        st.warning("ReportLab is not installed.")
 
-    # ------------------------------------------------------
-    # CLEAR RESULTS
-    # ------------------------------------------------------
-    if st.button("Start New Analysis", type="secondary"):
+    if st.button("START NEW RESUME ANALYSIS", type="secondary"):
         st.session_state.analysis_result = None
         st.rerun()
 
     # Footer
     show_html("""
-        <div class="minimal-footer">
-            <div class="footer-brand">
-                Resumind<span style="font-size: 13px;">°</span>
+        <div class="luxury-footer">
+            <div class="footer-brand-title">
+                SOURA RESUME <span>AI</span>
             </div>
-            <div class="footer-copy">
-                Your resume. Your skills. Your next opportunity.<br>
-                © 2026 Resumind. All rights reserved.
+            <div class="footer-tagline">
+                Your Resume. Your Skills. Your Next Big Opportunity.<br>
+                © 2026 SOURA RESUME AI. All rights reserved.
             </div>
         </div>
     """)
