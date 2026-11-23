@@ -16,29 +16,28 @@ from llm_analyzer import analyse_resume
 # ==========================================================
 
 st.set_page_config(
-    page_title="SOURA RESUME AI — Cinematic Career Intelligence",
-    page_icon="⚡",
+    page_title="Resumind AI — Executive Resume Intelligence",
+    page_icon="✦",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 
 # ==========================================================
-# 2. LUXURY EDITORIAL DESIGN SYSTEM & ANIMATIONS
+# 2. LUXURY EDITORIAL DESIGN SYSTEM (CRAFTED, NOT AI SLOP)
 # ==========================================================
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-/* --- Root Variables & Theme Colors --- */
+/* --- Root & Palette --- */
 :root {
     --bg-ivory: #F3F0E8;
     --text-primary: #151515;
     --accent-blue: #4263EB;
-    --text-muted: #888888;
+    --text-muted: #7E7E7E;
     --dark-navy: #071522;
-    --card-soft-white: rgba(255, 255, 255, 0.82);
     --border-subtle: rgba(21, 21, 21, 0.08);
 }
 
@@ -49,17 +48,17 @@ html {
 body, .stApp {
     background-color: #F3F0E8 !important;
     background-image: 
-        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(243, 240, 232, 0.7) 50%, rgba(235, 230, 218, 0.4) 100%),
-        radial-gradient(circle at 90% 20%, rgba(66, 99, 235, 0.04) 0%, transparent 45%),
-        radial-gradient(circle at 10% 40%, rgba(66, 99, 235, 0.03) 0%, transparent 45%) !important;
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(243, 240, 232, 0.75) 55%, rgba(235, 230, 218, 0.45) 100%),
+        radial-gradient(circle at 85% 15%, rgba(66, 99, 235, 0.035) 0%, transparent 40%),
+        radial-gradient(circle at 15% 45%, rgba(66, 99, 235, 0.03) 0%, transparent 40%) !important;
     color: #151515 !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     -webkit-font-smoothing: antialiased;
 }
 
 .block-container {
-    max-width: 1240px !important;
-    padding-top: 1rem !important;
+    max-width: 1220px !important;
+    padding-top: 1.2rem !important;
     padding-bottom: 5rem !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
@@ -74,92 +73,34 @@ header[data-testid="stHeader"] {
 }
 
 /* --- Navigation Bar --- */
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 28px;
-    background: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 9999px;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.05);
-}
-
-.nav-brand-text {
+.brand-title {
     font-family: 'Cinzel', 'Plus Jakarta Sans', serif;
     font-weight: 700;
-    font-size: 16px;
-    letter-spacing: 0.18em;
+    font-size: 18px;
+    letter-spacing: 0.16em;
     color: #151515;
     text-transform: uppercase;
 }
 
-.nav-brand-text span {
+.brand-title span {
     color: #4263EB;
 }
 
-.nav-links-row {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-}
-
-.nav-link-item {
-    font-size: 11.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: #555555;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    cursor: pointer;
-}
-
-.nav-link-item:hover {
-    color: #4263EB;
-}
-
-.nav-cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #151515;
-    color: #FFFFFF !important;
-    padding: 9px 22px;
-    border-radius: 9999px;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 14px rgba(21, 21, 21, 0.15);
-}
-
-.nav-cta-btn:hover {
-    background: #4263EB;
-    transform: translateY(-1.5px);
-    box-shadow: 0 8px 20px rgba(66, 99, 235, 0.3);
-}
-
-/* --- Streamlit Native Button Overrides --- */
+/* --- Streamlit Buttons (Clean Luxury Aesthetic) --- */
 .stButton > button {
     background: #151515 !important;
     color: #FFFFFF !important;
     border: 1px solid #151515 !important;
     border-radius: 9999px !important;
-    padding: 12px 28px !important;
+    padding: 11px 26px !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 13.5px !important;
-    letter-spacing: 0.08em !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: 0 6px 18px rgba(21, 21, 21, 0.12) !important;
-    min-height: 48px !important;
+    box-shadow: 0 4px 14px rgba(21, 21, 21, 0.1) !important;
+    min-height: 46px !important;
 }
 
 .stButton > button:hover {
@@ -167,14 +108,14 @@ header[data-testid="stHeader"] {
     color: #FFFFFF !important;
     border-color: #4263EB !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 10px 28px rgba(66, 99, 235, 0.35) !important;
+    box-shadow: 0 8px 24px rgba(66, 99, 235, 0.3) !important;
 }
 
 .stButton > button[kind="secondary"] {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
     color: #151515 !important;
     border: 1px solid rgba(21, 21, 21, 0.1) !important;
-    box-shadow: 0 4px 12px rgba(21, 21, 21, 0.04) !important;
+    box-shadow: 0 2px 8px rgba(21, 21, 21, 0.03) !important;
 }
 
 .stButton > button[kind="secondary"]:hover {
@@ -191,10 +132,10 @@ header[data-testid="stHeader"] {
     padding: 13px 32px !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
-    box-shadow: 0 8px 24px rgba(66, 99, 235, 0.25) !important;
+    box-shadow: 0 6px 20px rgba(66, 99, 235, 0.25) !important;
     transition: all 0.25s ease !important;
     min-height: 50px !important;
 }
@@ -203,18 +144,18 @@ header[data-testid="stHeader"] {
     background: #364fc7 !important;
     border-color: #364fc7 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 12px 30px rgba(66, 99, 235, 0.4) !important;
+    box-shadow: 0 10px 28px rgba(66, 99, 235, 0.38) !important;
 }
 
-/* --- Cinematic Hero Section --- */
-.hero-stage-wrap {
+/* --- Hero Section Typography --- */
+.hero-wrapper {
     position: relative;
     text-align: center;
-    padding: 60px 10px 50px 10px;
-    margin-bottom: 25px;
+    padding: 50px 10px 30px 10px;
+    margin-bottom: 20px;
 }
 
-.hero-editorial-badge {
+.hero-pill-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -222,192 +163,224 @@ header[data-testid="stHeader"] {
     border: 1px solid rgba(66, 99, 235, 0.2);
     backdrop-filter: blur(12px);
     border-radius: 9999px;
-    padding: 7px 20px;
-    font-size: 12px;
+    padding: 6px 18px;
+    font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.15em;
     color: #4263EB;
     text-transform: uppercase;
     margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(66, 99, 235, 0.08);
+    box-shadow: 0 4px 14px rgba(66, 99, 235, 0.08);
 }
 
-.hero-editorial-title {
+.hero-title-main {
     font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 78px;
-    line-height: 1.05;
+    font-size: 74px;
+    line-height: 1.08;
     color: #151515;
     font-weight: 400;
     letter-spacing: -0.03em;
-    margin: 0 auto 22px auto;
-    max-width: 900px;
+    margin: 0 auto 20px auto;
+    max-width: 880px;
 }
 
-.hero-editorial-title em {
+.hero-title-main em {
     font-style: italic;
     color: #151515;
 }
 
-.hero-supporting-text {
-    font-size: 18.5px;
-    line-height: 1.75;
+.hero-subtext-main {
+    font-size: 18px;
+    line-height: 1.7;
     color: #666666;
-    max-width: 680px;
-    margin: 0 auto 36px auto;
+    max-width: 660px;
+    margin: 0 auto 34px auto;
     font-weight: 400;
 }
 
-/* --- 3D Floating Illustration & Neural Particles --- */
-.hero-3d-visual-container {
-    position: relative;
-    max-width: 1040px;
-    margin: 20px auto 40px auto;
-    padding: 30px 15px;
-}
-
-.floating-doc-canvas {
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.96) 0%, rgba(247, 244, 237, 0.8) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.95);
-    border-radius: 36px;
-    padding: 50px 30px;
-    box-shadow: 
-        0 30px 70px -20px rgba(7, 21, 34, 0.08),
-        0 0 1px 1px rgba(255, 255, 255, 0.8);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Floating Particle Pills with 3D Keyframe Oscillations */
-@keyframes float3DLeft {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-12px) rotate(-1deg); }
-}
-
-@keyframes float3DRight {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(12px) rotate(1deg); }
-}
-
-@keyframes floatCenterDoc {
-    0%, 100% { transform: translateY(0px) scale(1); }
-    50% { transform: translateY(-6px) scale(1.01); }
-}
-
-.float-3d-left {
-    animation: float3DLeft 6s ease-in-out infinite;
-}
-
-.float-3d-right {
-    animation: float3DRight 7s ease-in-out infinite;
-}
-
-.float-center-doc {
-    animation: floatCenterDoc 5s ease-in-out infinite;
-}
-
-/* Neural Network Simulation SVG */
-.neural-lines-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0.45;
-}
-
-/* Central 3D Document Illustration */
-.center-doc-representation {
-    width: 220px;
-    height: 290px;
+/* --- AUTHENTIC PRODUCT INTERFACE PREVIEW (NOT AI SLOP) --- */
+.product-preview-card {
     background: #FFFFFF;
-    border: 1px solid rgba(66, 99, 235, 0.25);
-    border-radius: 18px;
-    margin: 0 auto;
-    padding: 24px 20px;
+    border: 1px solid rgba(21, 21, 21, 0.09);
+    border-radius: 28px;
+    padding: 34px 38px;
+    max-width: 960px;
+    margin: 25px auto 40px auto;
     box-shadow: 
-        0 25px 50px -15px rgba(66, 99, 235, 0.18),
-        0 0 0 1px rgba(66, 99, 235, 0.08);
-    position: relative;
-    z-index: 2;
+        0 24px 60px -18px rgba(7, 21, 34, 0.08),
+        0 0 1px 1px rgba(21, 21, 21, 0.03);
     text-align: left;
+    transition: all 0.3s ease;
 }
 
-.doc-line-skeleton {
-    height: 7px;
-    background: #EDE8DE;
-    border-radius: 4px;
+.product-preview-card:hover {
+    box-shadow: 0 30px 70px -18px rgba(7, 21, 34, 0.12);
+}
+
+.preview-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(21, 21, 21, 0.06);
+    margin-bottom: 24px;
+}
+
+.candidate-profile-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.candidate-avatar-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #071522;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.candidate-name-title h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #151515;
+    margin: 0;
+}
+
+.candidate-name-title span {
+    font-size: 12.5px;
+    color: #7E7E7E;
+    font-weight: 500;
+}
+
+.preview-score-capsule {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(66, 99, 235, 0.08);
+    border: 1px solid rgba(66, 99, 235, 0.2);
+    border-radius: 9999px;
+    padding: 7px 18px;
+}
+
+.preview-score-capsule .score-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #4263EB;
+}
+
+.preview-score-capsule .score-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4263EB;
+}
+
+.preview-body-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 30px;
+}
+
+.resume-annotated-excerpt {
+    background: #FAF8F4;
+    border: 1px solid rgba(21, 21, 21, 0.06);
+    border-radius: 18px;
+    padding: 22px 24px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #333333;
+}
+
+.resume-annotated-excerpt .excerpt-tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4263EB;
+    background: rgba(66, 99, 235, 0.08);
+    padding: 3px 9px;
+    border-radius: 6px;
     margin-bottom: 12px;
 }
 
-.doc-line-skeleton.short { width: 50%; }
-.doc-line-skeleton.medium { width: 75%; }
-.doc-line-skeleton.highlight { background: #4263EB; opacity: 0.85; }
+.diagnostic-panel-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
-/* Satellite Particle Chips */
-.particle-chip {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(66, 99, 235, 0.2);
-    backdrop-filter: blur(14px);
-    border-radius: 9999px;
-    padding: 10px 22px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #151515;
-    box-shadow: 0 10px 25px -8px rgba(7, 21, 34, 0.08);
-    display: inline-flex;
+.diagnostic-box-mini {
+    background: #FAF8F4;
+    border: 1px solid rgba(21, 21, 21, 0.06);
+    border-radius: 16px;
+    padding: 16px 20px;
+}
+
+.diagnostic-box-mini h5 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 10px 0;
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
-.particle-chip .chip-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #4263EB;
-    box-shadow: 0 0 10px #4263EB;
+.diagnostic-box-mini.strengths h5 { color: #2B8A3E; }
+.diagnostic-box-mini.gaps h5 { color: #C92A2A; }
+
+.mini-pill-tag {
+    display: inline-block;
+    padding: 4px 11px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin: 3px 2px;
 }
 
-/* --- SCROLLING POPPING UP ANIMATIONS --- */
-@keyframes scrollPopIn {
-    0% {
-        opacity: 0;
-        transform: translateY(40px) scale(0.96);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0px) scale(1);
-    }
+.mini-pill-tag.green {
+    background: #EBFBEE;
+    color: #2B8A3E;
+    border: 1px solid #D3F9D8;
 }
 
-.scroll-pop {
-    animation: scrollPopIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+.mini-pill-tag.red {
+    background: #FFF5F5;
+    color: #C92A2A;
+    border: 1px solid #FFE3E3;
 }
 
-.pop-delay-1 { animation-delay: 0.1s; }
-.pop-delay-2 { animation-delay: 0.22s; }
-.pop-delay-3 { animation-delay: 0.35s; }
-.pop-delay-4 { animation-delay: 0.48s; }
-
-/* Continuous Infinite Marquee Strip */
+/* --- Marquee Ribbon --- */
 .marquee-ribbon {
     width: 100%;
     overflow: hidden;
-    padding: 18px 0;
-    margin: 40px 0 50px 0;
+    padding: 16px 0;
+    margin: 30px 0 45px 0;
     background: rgba(255, 255, 255, 0.7);
     border-top: 1px solid rgba(21, 21, 21, 0.06);
     border-bottom: 1px solid rgba(21, 21, 21, 0.06);
-    backdrop-filter: blur(12px);
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    backdrop-filter: blur(10px);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 
 .marquee-stream {
     display: flex;
     width: max-content;
-    gap: 36px;
-    animation: streamAnimation 32s linear infinite;
+    gap: 32px;
+    animation: streamAnimation 30s linear infinite;
 }
 
 .marquee-stream:hover {
@@ -417,18 +390,18 @@ header[data-testid="stHeader"] {
 .marquee-badge {
     display: inline-flex;
     align-items: center;
-    gap: 9px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 12.5px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #2B2B2B;
+    color: #2D2D2D;
     white-space: nowrap;
-    padding: 7px 18px;
+    padding: 6px 16px;
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(21, 21, 21, 0.07);
     border-radius: 9999px;
-    box-shadow: 0 4px 12px rgba(21, 21, 21, 0.03);
+    box-shadow: 0 2px 8px rgba(21, 21, 21, 0.02);
 }
 
 .marquee-badge span.sparkle {
@@ -443,11 +416,11 @@ header[data-testid="stHeader"] {
 /* --- Section Title Typography --- */
 .editorial-section-header {
     text-align: center;
-    margin: 65px 0 35px 0;
+    margin: 60px 0 32px 0;
 }
 
 .editorial-tag {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.16em;
     color: #4263EB;
@@ -458,7 +431,7 @@ header[data-testid="stHeader"] {
 
 .editorial-headline {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 46px;
+    font-size: 44px;
     line-height: 1.15;
     color: #151515;
     font-weight: 400;
@@ -466,65 +439,51 @@ header[data-testid="stHeader"] {
 }
 
 .editorial-subtext {
-    font-size: 16.5px;
+    font-size: 16px;
     color: #666666;
-    max-width: 650px;
+    max-width: 620px;
     margin: 0 auto;
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
-/* --- Features Grid (6 Editorial Cards) --- */
+/* --- 6 Capability Cards (Refined & Tasteful) --- */
 .editorial-feature-card {
     background: #FFFFFF;
     border: 1px solid rgba(21, 21, 21, 0.07);
-    border-radius: 26px;
-    padding: 36px 30px;
-    box-shadow: 0 12px 35px -12px rgba(7, 21, 34, 0.04);
-    min-height: 240px;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 24px;
+    padding: 34px 28px;
+    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.03);
+    min-height: 230px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
 }
 
 .editorial-feature-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 45px -15px rgba(66, 99, 235, 0.12);
-    border-color: rgba(66, 99, 235, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px -15px rgba(66, 99, 235, 0.1);
+    border-color: rgba(66, 99, 235, 0.25);
 }
 
 .feature-num-stamp {
     font-family: 'Space Grotesk', monospace;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #4263EB;
-    letter-spacing: 0.1em;
-    margin-bottom: 18px;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
     display: block;
 }
 
-.feature-icon-frame {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    background: #F3F0E8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
 .editorial-feature-card h3 {
-    font-size: 19px;
-    font-weight: 600;
+    font-size: 18.5px;
+    font-weight: 700;
     color: #151515;
     margin: 0 0 10px 0;
     letter-spacing: -0.01em;
 }
 
 .editorial-feature-card p {
-    font-size: 14.5px;
+    font-size: 14px;
     color: #666666;
     line-height: 1.65;
     margin: 0;
@@ -534,18 +493,17 @@ header[data-testid="stHeader"] {
 .timeline-card-stage {
     background: #FFFFFF;
     border: 1px solid rgba(21, 21, 21, 0.08);
-    border-radius: 24px;
-    padding: 32px 24px;
-    box-shadow: 0 12px 30px -10px rgba(7, 21, 34, 0.04);
+    border-radius: 22px;
+    padding: 30px 22px;
+    box-shadow: 0 10px 28px -10px rgba(7, 21, 34, 0.03);
     text-align: left;
-    position: relative;
     transition: all 0.3s ease;
 }
 
 .timeline-card-stage:hover {
     transform: translateY(-4px);
     border-color: #4263EB;
-    box-shadow: 0 16px 40px -12px rgba(66, 99, 235, 0.12);
+    box-shadow: 0 16px 36px -12px rgba(66, 99, 235, 0.12);
 }
 
 .timeline-step-badge {
@@ -558,8 +516,8 @@ header[data-testid="stHeader"] {
 }
 
 .timeline-card-stage h4 {
-    font-size: 17px;
-    font-weight: 600;
+    font-size: 16.5px;
+    font-weight: 700;
     color: #151515;
     margin: 0 0 8px 0;
 }
@@ -571,22 +529,20 @@ header[data-testid="stHeader"] {
     margin: 0;
 }
 
-/* --- Deep Navy (#071522) Luxury Contrast Section --- */
+/* --- Deep Navy Luxury Section --- */
 .dark-editorial-section {
     background: #071522;
-    border-radius: 36px;
-    padding: 70px 50px;
-    margin: 60px 0 30px 0;
+    border-radius: 34px;
+    padding: 65px 48px;
+    margin: 55px 0 25px 0;
     color: #FFFFFF;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 30px 80px -25px rgba(7, 21, 34, 0.4);
+    box-shadow: 0 25px 70px -20px rgba(7, 21, 34, 0.4);
 }
 
 .dark-editorial-badge {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     color: #4263EB;
     text-transform: uppercase;
     margin-bottom: 16px;
@@ -595,10 +551,10 @@ header[data-testid="stHeader"] {
 
 .dark-editorial-quote {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 44px;
-    line-height: 1.2;
+    font-size: 40px;
+    line-height: 1.25;
     color: #FFFFFF;
-    margin: 0 0 32px 0;
+    margin: 0 0 30px 0;
     max-width: 820px;
     font-weight: 400;
 }
@@ -612,13 +568,13 @@ header[data-testid="stHeader"] {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
-    padding-top: 36px;
+    padding-top: 32px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .dark-stat-box h3 {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 42px;
+    font-size: 38px;
     font-weight: 700;
     color: #FFFFFF;
     margin: 0 0 6px 0;
@@ -629,7 +585,7 @@ header[data-testid="stHeader"] {
 }
 
 .dark-stat-box p {
-    font-size: 14px;
+    font-size: 13.5px;
     color: #A0AEC0;
     line-height: 1.6;
     margin: 0;
@@ -639,9 +595,9 @@ header[data-testid="stHeader"] {
 div[data-testid="stFileUploader"] {
     background: #FFFFFF !important;
     border: 2px dashed rgba(66, 99, 235, 0.35) !important;
-    border-radius: 26px !important;
-    padding: 30px !important;
-    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
+    border-radius: 24px !important;
+    padding: 28px !important;
+    box-shadow: 0 8px 24px -10px rgba(7, 21, 34, 0.04) !important;
     transition: all 0.25s ease !important;
 }
 
@@ -653,8 +609,8 @@ div[data-testid="stFileUploader"]:hover {
 div[data-baseweb="textarea"] {
     background: #FFFFFF !important;
     border: 1px solid rgba(21, 21, 21, 0.1) !important;
-    border-radius: 22px !important;
-    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 24px -10px rgba(7, 21, 34, 0.04) !important;
     transition: all 0.2s ease !important;
 }
 
@@ -667,44 +623,44 @@ div[data-baseweb="textarea"] textarea {
     background: transparent !important;
     color: #151515 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 15px !important;
+    font-size: 14.5px !important;
     line-height: 1.65 !important;
-    padding: 20px !important;
+    padding: 18px !important;
 }
 
 /* Metric Display Overrides */
 div[data-testid="stMetric"] {
     background: #FFFFFF !important;
     border: 1px solid rgba(21, 21, 21, 0.07) !important;
-    border-radius: 24px !important;
-    padding: 24px !important;
-    box-shadow: 0 10px 30px -10px rgba(7, 21, 34, 0.04) !important;
+    border-radius: 22px !important;
+    padding: 22px !important;
+    box-shadow: 0 8px 24px -10px rgba(7, 21, 34, 0.04) !important;
 }
 
 div[data-testid="stMetricLabel"] {
-    color: #888888 !important;
+    color: #7E7E7E !important;
     font-size: 12px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
+    letter-spacing: 0.08em !important;
 }
 
 div[data-testid="stMetricValue"] {
     color: #151515 !important;
     font-family: 'Instrument Serif', Georgia, serif !important;
-    font-size: 38px !important;
+    font-size: 36px !important;
     font-weight: 400 !important;
 }
 
-/* Circular & Linear Progress */
+/* Progress Bars */
 div[data-testid="stProgressBar"] > div {
     background-color: #E2DDD0 !important;
     border-radius: 9999px !important;
-    height: 12px !important;
+    height: 11px !important;
 }
 
 div[data-testid="stProgressBar"] div[role="progressbar"] > div {
-    background: linear-gradient(90deg, #4263EB 0%, #364FC7 100%) !important;
+    background: #4263EB !important;
     border-radius: 9999px !important;
 }
 
@@ -713,7 +669,7 @@ div[data-testid="stProgressBar"] div[role="progressbar"] > div {
     display: inline-block;
     background: rgba(66, 99, 235, 0.08);
     color: #4263EB;
-    border: 1px solid rgba(66, 99, 235, 0.25);
+    border: 1px solid rgba(66, 99, 235, 0.22);
     border-radius: 9999px;
     padding: 7px 18px;
     margin: 4px;
@@ -737,35 +693,35 @@ div[data-testid="stProgressBar"] div[role="progressbar"] > div {
 .luxury-editorial-card {
     background: #FFFFFF;
     border: 1px solid rgba(21, 21, 21, 0.08);
-    border-radius: 28px;
-    padding: 40px 36px;
-    box-shadow: 0 14px 40px -12px rgba(7, 21, 34, 0.05);
-    margin: 22px 0;
+    border-radius: 26px;
+    padding: 38px 34px;
+    box-shadow: 0 12px 36px -12px rgba(7, 21, 34, 0.05);
+    margin: 20px 0;
     line-height: 1.85;
     color: #2D3748;
 }
 
 .luxury-editorial-card h3 {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 400;
     color: #151515;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 /* Footer */
 .luxury-footer {
-    padding: 60px 0 25px 0;
-    margin-top: 70px;
+    padding: 55px 0 25px 0;
+    margin-top: 65px;
     border-top: 1px solid rgba(21, 21, 21, 0.08);
     text-align: center;
 }
 
 .footer-brand-title {
     font-family: 'Cinzel', serif;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     color: #151515;
     margin-bottom: 8px;
 }
@@ -775,8 +731,8 @@ div[data-testid="stProgressBar"] div[role="progressbar"] > div {
 }
 
 .footer-tagline {
-    font-size: 14px;
-    color: #888888;
+    font-size: 13.5px;
+    color: #7E7E7E;
     line-height: 1.8;
 }
 
@@ -949,7 +905,7 @@ def create_pdf_report(candidate, match_data, ai_analysis):
 
         story.append(
             Paragraph(
-                "<font color='#071522'><b>SOURA RESUME AI</b></font>",
+                "<font color='#071522'><b>RESUMIND AI</b></font>",
                 styles["Title"]
             )
         )
@@ -1068,15 +1024,12 @@ def create_pdf_report(candidate, match_data, ai_analysis):
 # 9. MINIMALIST EDITORIAL NAVIGATION BAR
 # ==========================================================
 
-# Minimalist Top Bar with exact spelling: SOURA RESUME AI
 top_nav_c1, top_nav_c2, top_nav_c3 = st.columns([2.8, 3.2, 1.4], vertical_alignment="center")
 
 with top_nav_c1:
     show_html("""
-        <div style="display: flex; align-items: baseline; gap: 4px;">
-            <span style="font-family:'Cinzel',serif; font-weight:700; font-size:17px; letter-spacing:0.18em; color:#151515;">
-                SOURA RESUME <span style="color:#4263EB;">AI</span>
-            </span>
+        <div class="brand-title">
+            RESUMIND <span>AI</span>
         </div>
     """)
 
@@ -1098,26 +1051,26 @@ with top_nav_c3:
 
 
 # ==========================================================
-# 10. HOMEPAGE VIEW (CINEMATIC HERO, SCROLLING POPUPS & EDITORIAL SECTIONS)
+# 10. HOMEPAGE VIEW (EDITORIAL STORYTELLING — NO AI SLOP)
 # ==========================================================
 
 if st.session_state.page == "Home":
 
-    # CINEMATIC FULL-SCREEN HERO SECTION
+    # HERO SECTION
     show_html("""
-        <div class="hero-stage-wrap scroll-pop">
+        <div class="hero-wrapper">
 
-            <div class="hero-editorial-badge">
-                ⚡ SOURA RESUME AI &bull; NEXT-GEN CAREER INTELLIGENCE
+            <div class="hero-pill-badge">
+                ✦ RESUMIND AI &bull; EXECUTIVE CAREER INTELLIGENCE
             </div>
 
-            <h1 class="hero-editorial-title">
-                Your Resume.<br>
-                <em>Your Next Big Opportunity.</em>
+            <h1 class="hero-title-main">
+                A sharper resume.<br>
+                <em>Your next defining role.</em>
             </h1>
 
-            <p class="hero-supporting-text">
-                Discover your potential. Analyse your resume with artificial intelligence and find out how well your skills match your dream career.
+            <p class="hero-subtext-main">
+                Resumind provides rigorous, objective resume intelligence — benchmarking your real experience against what hiring teams and modern ATS engines actually look for.
             </p>
 
         </div>
@@ -1130,147 +1083,128 @@ if st.session_state.page == "Home":
             st.session_state.page = "Analysis"
             st.rerun()
 
-    # 3D FLOATING ILLUSTRATION (RESUME TRANSFORMING INTO DIGITAL PARTICLES & NEURAL NETWORKS)
+    # REALISTIC PRODUCT INTERFACE PREVIEW (TANGIBLE & CRAFTED, NOT AI SLOP)
     show_html("""
-        <div class="hero-3d-visual-container scroll-pop pop-delay-1">
+        <div class="product-preview-card">
 
-            <div class="floating-doc-canvas">
-
-                <!-- Ambient Neural Nodes SVG -->
-                <svg class="neural-lines-bg" viewBox="0 0 1000 450" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M150 220 Q 300 120, 500 220 T 850 220" stroke="#4263EB" stroke-width="1.5" stroke-dasharray="4 6"/>
-                    <path d="M150 220 Q 400 340, 500 220 T 850 160" stroke="#4263EB" stroke-width="1" stroke-dasharray="6 8"/>
-                    <circle cx="150" cy="220" r="5" fill="#4263EB"/>
-                    <circle cx="320" cy="140" r="4" fill="#4263EB" opacity="0.6"/>
-                    <circle cx="500" cy="220" r="6" fill="#151515"/>
-                    <circle cx="680" cy="300" r="4" fill="#4263EB" opacity="0.6"/>
-                    <circle cx="850" cy="220" r="5" fill="#4263EB"/>
-                </svg>
-
-                <div style="display: grid; grid-template-columns: 240px 1fr 240px; gap: 20px; align-items: center; position: relative; z-index: 3;">
-
-                    <!-- Left Floating Particles -->
-                    <div class="float-3d-left" style="display: flex; flex-direction: column; gap: 16px;">
-                        <div class="particle-chip">
-                            <span class="chip-dot"></span>
-                            <span>⚡ Neural Skill Parsing</span>
-                        </div>
-                        <div class="particle-chip">
-                            <span class="chip-dot"></span>
-                            <span>◈ 98.4% ATS Precision</span>
-                        </div>
+            <div class="preview-header-bar">
+                <div class="candidate-profile-meta">
+                    <div class="candidate-avatar-initials">AR</div>
+                    <div class="candidate-name-title">
+                        <h4>Alex Rivera</h4>
+                        <span>Staff Infrastructure Architect &bull; Verified Evaluation</span>
                     </div>
+                </div>
+                <div class="preview-score-capsule">
+                    <span class="score-num">89%</span>
+                    <span class="score-label">Role Fit</span>
+                </div>
+            </div>
 
-                    <!-- Center 3D Floating Resume Document -->
-                    <div class="float-center-doc">
-                        <div class="center-doc-representation">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; color: #4263EB; letter-spacing: 0.1em;">
-                                    RESUME.PDF
-                                </span>
-                                <span style="font-size: 11px; color: #888888;">VERIFIED</span>
-                            </div>
-                            <div class="doc-line-skeleton highlight"></div>
-                            <div class="doc-line-skeleton short"></div>
-                            <div style="margin: 16px 0 10px 0; border-top: 1px dashed rgba(66, 99, 235, 0.2);"></div>
-                            <div class="doc-line-skeleton medium"></div>
-                            <div class="doc-line-skeleton"></div>
-                            <div class="doc-line-skeleton short"></div>
-                            <div class="doc-line-skeleton medium"></div>
-                            <div style="margin-top: 18px; display: flex; gap: 6px;">
-                                <span style="background: rgba(66, 99, 235, 0.1); color: #4263EB; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px;">AI MATCHED</span>
-                                <span style="background: #151515; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px;">TOP 5%</span>
-                            </div>
-                        </div>
+            <div class="preview-body-grid">
+                <!-- Real annotated experience bullet -->
+                <div class="resume-annotated-excerpt">
+                    <span class="excerpt-tag">High-Impact Bullet Audit</span>
+                    <p style="margin: 0; color: #151515; font-weight: 500;">
+                        “Architected distributed event-streaming pipelines across 4 cloud regions, reducing p99 latency from 180ms to 42ms and cutting annual compute expenditure by $240K.”
+                    </p>
+                    <div style="margin-top: 14px; font-size: 12px; color: #4263EB; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        <span>✓</span> Strong quantified outcome &bull; High recruiter engagement factor (+14%)
                     </div>
-
-                    <!-- Right Floating Particles -->
-                    <div class="float-3d-right" style="display: flex; flex-direction: column; gap: 16px;">
-                        <div class="particle-chip">
-                            <span class="chip-dot"></span>
-                            <span>▲ Career Gap Audit</span>
-                        </div>
-                        <div class="particle-chip">
-                            <span class="chip-dot"></span>
-                            <span>✦ Gemma 3 Reasoning</span>
-                        </div>
-                    </div>
-
                 </div>
 
-                <div style="text-align: center; margin-top: 30px; font-size: 13.5px; color: #666666; font-weight: 500;">
-                    Autonomous synthesis transforming static resumes into predictive career leverage.
+                <!-- Grounded Strengths and Gaps -->
+                <div class="diagnostic-panel-preview">
+                    <div class="diagnostic-box-mini strengths">
+                        <h5><span>●</span> Confirmed Qualifications</h5>
+                        <div>
+                            <span class="mini-pill-tag green">Distributed Systems</span>
+                            <span class="mini-pill-tag green">Kubernetes</span>
+                            <span class="mini-pill-tag green">Golang</span>
+                            <span class="mini-pill-tag green">High-Throughput IO</span>
+                        </div>
+                    </div>
+                    <div class="diagnostic-box-mini gaps">
+                        <h5><span>●</span> Critical Gaps Flagged</h5>
+                        <div>
+                            <span class="mini-pill-tag red">Terraform v1.6+</span>
+                            <span class="mini-pill-tag red">Distributed Tracing</span>
+                            <span class="mini-pill-tag red">eBPF</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
+            <div style="margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(21, 21, 21, 0.05); display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: #7E7E7E;">
+                <span>Evaluated via deterministic skill taxonomy & local Gemma AI reasoning</span>
+                <span style="color: #4263EB; font-weight: 600;">100% Private &bull; On-Device Execution</span>
             </div>
 
         </div>
     """)
 
-    # CONTINUOUS INFINITE SCROLLING RIBBON
+    # MARQUEE RIBBON
     show_html("""
         <div class="marquee-ribbon">
             <div class="marquee-stream">
-                <div class="marquee-badge"><span class="sparkle">✦</span> AI Resume Analysis</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Checker</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Detection</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Job Description Matching</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Resume Improvement Suggestions</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Career Recommendations</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> 100% Private On-Device AI</div>
-                <!-- Continuous Loop -->
-                <div class="marquee-badge"><span class="sparkle">✦</span> AI Resume Analysis</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Checker</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Detection</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Job Description Matching</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Resume Improvement Suggestions</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> Career Recommendations</div>
-                <div class="marquee-badge"><span class="sparkle">✦</span> 100% Private On-Device AI</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Deterministic Skill Taxonomy</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Auditing</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> On-Device Local Privacy</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Gemma Language Model</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Diagnostics</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Executive PDF Reporting</div>
+                <!-- Duplicate for seamless loop -->
+                <div class="marquee-badge"><span class="sparkle">✦</span> Deterministic Skill Taxonomy</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> ATS Compatibility Auditing</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> On-Device Local Privacy</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Gemma Language Model</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Skill Gap Diagnostics</div>
+                <div class="marquee-badge"><span class="sparkle">✦</span> Executive PDF Reporting</div>
             </div>
         </div>
     """)
 
-    # SECTION: HOW IT WORKS (01 - 04 CONNECTED VISUAL TIMELINE)
+    # HOW IT WORKS (01 - 04 CONNECTED TIMELINE)
     show_html("""
-        <div class="editorial-section-header scroll-pop">
-            <span class="editorial-tag">PROCESS WORKFLOW</span>
-            <h2 class="editorial-headline">How It Works</h2>
+        <div class="editorial-section-header">
+            <span class="editorial-tag">METHODOLOGY</span>
+            <h2 class="editorial-headline">How Resumind Works</h2>
             <p class="editorial-subtext">
-                An intelligent four-step journey designed to dissect, benchmark, and elevate your professional career narrative.
+                A four-step analytical pipeline engineered to dissect, benchmark, and elevate your career narrative.
             </p>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 30px 0 50px 0;">
-            <div class="timeline-card-stage scroll-pop pop-delay-1">
+            <div class="timeline-card-stage">
                 <span class="timeline-step-badge">01</span>
-                <h4>Upload Your Resume</h4>
-                <p>Submit your text-based PDF resume through our secure drag-and-drop dropzone.</p>
+                <h4>Document Ingestion</h4>
+                <p>PyMuPDF parses structural hierarchies, degrees, contact data, and employment timelines from text PDFs.</p>
             </div>
-            <div class="timeline-card-stage scroll-pop pop-delay-2">
+            <div class="timeline-card-stage">
                 <span class="timeline-step-badge">02</span>
-                <h4>AI Extracts Information</h4>
-                <p>PyMuPDF parses contact details, structural headings, degrees, and employment timelines.</p>
+                <h4>Taxonomy Extraction</h4>
+                <p>Deterministic algorithms cross-reference candidate history against 1,000+ standardized industry skills.</p>
             </div>
-            <div class="timeline-card-stage scroll-pop pop-delay-3">
+            <div class="timeline-card-stage">
                 <span class="timeline-step-badge">03</span>
-                <h4>Analyse Skills & Experience</h4>
-                <p>Deterministic taxonomy mapping cross-references 1,000+ role skills to isolate critical gaps.</p>
+                <h4>Gemma AI Synthesis</h4>
+                <p>Local Gemma model evaluates qualitative depth, active phrasing, and specific qualification gaps.</p>
             </div>
-            <div class="timeline-card-stage scroll-pop pop-delay-4">
+            <div class="timeline-card-stage">
                 <span class="timeline-step-badge">04</span>
-                <h4>Receive Career Report</h4>
-                <p>Gemma AI generates qualitative guidance, compatibility scoring, and exportable PDF audits.</p>
+                <h4>Executive Report</h4>
+                <p>Receive transparent match metrics, gap breakdowns, and an exportable formal PDF career audit.</p>
             </div>
         </div>
     """)
 
-    # SECTION: EDITORIAL FEATURES (6 DISTINCTIVE CAPABILITIES)
+    # 6 CORE CAPABILITY MODULES
     show_html("""
-        <div class="editorial-section-header scroll-pop">
+        <div class="editorial-section-header">
             <span class="editorial-tag">CORE CAPABILITIES</span>
-            <h2 class="editorial-headline">Designed for Career Clarity</h2>
+            <h2 class="editorial-headline">Designed for Objective Clarity</h2>
             <p class="editorial-subtext">
-                Six tailored intelligence modules engineered to maximize recruiter interest and pass enterprise ATS screens.
+                Six specialized diagnostic modules built to help applicants navigate enterprise screening and recruiter evaluations.
             </p>
         </div>
     """)
@@ -1279,99 +1213,93 @@ if st.session_state.page == "Home":
 
     with f_row1_c1:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-1">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 01</span>
-                <div class="feature-icon-frame">📄</div>
-                <h3>AI Resume Analysis</h3>
+                <h3>Document Structure Audit</h3>
                 <p>
-                    Full structural and semantic evaluation of your document, diagnosing profile completeness, word count density, and clarity.
+                    Full structural evaluation of your document — verifying header recognition, section completeness, word density, and chronology.
                 </p>
             </div>
         """)
 
     with f_row1_c2:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-2">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 02</span>
-                <div class="feature-icon-frame">🎯</div>
-                <h3>ATS Compatibility Checker</h3>
+                <h3>ATS Parsing Simulation</h3>
                 <p>
-                    Simulates Fortune 500 parsing engines to verify whether your formatting, headers, and bullet structures parse cleanly.
+                    Emulates enterprise Applicant Tracking Systems to test whether your formatting, bullets, and tables parse cleanly without errors.
                 </p>
             </div>
         """)
 
     with f_row1_c3:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-3">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 03</span>
-                <div class="feature-icon-frame">🔍</div>
                 <h3>Skill Gap Detection</h3>
                 <p>
-                    Highlights the exact hard competencies, toolsets, and certifications missing from your resume compared to role benchmarks.
+                    Isolates exact hard competencies, toolsets, and domain credentials missing from your profile compared to target role requirements.
                 </p>
             </div>
         """)
 
-    st.write("")  # Vertical spacer
+    st.write("")  # Vertical spacing
 
     f_row2_c1, f_row2_c2, f_row2_c3 = st.columns(3)
 
     with f_row2_c1:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-1">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 04</span>
-                <div class="feature-icon-frame">⚡</div>
-                <h3>Job Description Matching</h3>
+                <h3>Job Spec Alignment</h3>
                 <p>
-                    Upload target job specifications to receive instant percentage alignment and contextual keyword relevance scores.
+                    Compares your profile directly against target job descriptions to deliver an objective percentage suitability benchmark.
                 </p>
             </div>
         """)
 
     with f_row2_c2:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-2">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 05</span>
-                <div class="feature-icon-frame">💡</div>
-                <h3>Improvement Suggestions</h3>
+                <h3>Impact & Phrasing Review</h3>
                 <p>
-                    Actionable, bullet-by-bullet advice on framing achievements, quantifying impact, and rewriting weak experience sections.
+                    Diagnoses unquantified bullet points and passive voice, providing actionable guidance to sharpen achievement framing.
                 </p>
             </div>
         """)
 
     with f_row2_c3:
         show_html("""
-            <div class="editorial-feature-card scroll-pop pop-delay-3">
+            <div class="editorial-feature-card">
                 <span class="feature-num-stamp">MODULE 06</span>
-                <div class="feature-icon-frame">◈</div>
-                <h3>Career Recommendations</h3>
+                <h3>Executive PDF Reporting</h3>
                 <p>
-                    Strategic interview readiness roadmaps and executive next steps tailored directly to your professional aspirations.
+                    Generates a publication-grade, formal PDF career readiness report with detailed breakdowns and interview roadmaps.
                 </p>
             </div>
         """)
 
-    # SECTION: ABOUT (DEEP NAVY #071522 LUXURY CONTRAST STORYTELLING)
+    # ABOUT / DEEP NAVY LUXURY SECTION
     show_html("""
-        <div class="dark-editorial-section scroll-pop">
-            <span class="dark-editorial-badge">THE SOURA RESUME AI PHILOSOPHY</span>
+        <div class="dark-editorial-section">
+            <span class="dark-editorial-badge">THE RESUMIND AI PHILOSOPHY</span>
             <div class="dark-editorial-quote">
-                “Every career has a story. Our mission is to ensure your resume tells yours with <em>uncompromising precision</em>, objective clarity, and maximum hiring impact.”
+                “Career advice shouldn't be generic buzzwords. By uniting deterministic skill taxonomy with private local AI reasoning, candidates receive <em>objective, grounded truth</em> before submitting an application.”
             </div>
             <div class="dark-stats-grid">
                 <div class="dark-stat-box">
                     <h3>100<span>%</span></h3>
-                    <p>On-device local LLM execution. Your confidential resume data never leaves your machine.</p>
+                    <p>On-device local execution. Your confidential resume never leaves your machine.</p>
                 </div>
                 <div class="dark-stat-box">
                     <h3>1,000<span>+</span></h3>
-                    <p>Standardized industry competencies mapped across engineering, design, product, and leadership.</p>
+                    <p>Standardized industry competencies mapped across engineering, data, design, and management.</p>
                 </div>
                 <div class="dark-stat-box">
                     <h3>0<span>%</span></h3>
-                    <p>Hallucination tolerance. Every piece of feedback is grounded directly in verified text evidence.</p>
+                    <p>Hallucination tolerance. All evaluations are anchored to verified text in your resume.</p>
                 </div>
             </div>
         </div>
@@ -1381,18 +1309,18 @@ if st.session_state.page == "Home":
     show_html("""
         <div class="luxury-footer">
             <div class="footer-brand-title">
-                SOURA RESUME <span>AI</span>
+                RESUMIND <span>AI</span>
             </div>
             <div class="footer-tagline">
-                Your Resume. Your Skills. Your Next Big Opportunity.<br>
-                © 2026 SOURA RESUME AI. All rights reserved. • Contact: souradeepsaha190@gmail.com
+                Your Resume. Your Skills. Your Next Defining Opportunity.<br>
+                © 2026 Resumind AI. All rights reserved. • Contact: souradeepsaha190@gmail.com
             </div>
         </div>
     """)
 
 
 # ==========================================================
-# 11. RESUME ANALYSIS SECTION ("Every Career Has a Story.")
+# 11. RESUME ANALYSIS STUDIO
 # ==========================================================
 
 if st.session_state.page == "Analysis":
@@ -1400,11 +1328,11 @@ if st.session_state.page == "Analysis":
     show_html("""
         <div class="editorial-section-header" style="margin-top: 15px; margin-bottom: 30px;">
             <span class="editorial-tag">RESUME EVALUATION STUDIO</span>
-            <h1 class="hero-editorial-title" style="font-size: 56px; margin-bottom: 12px;">
-                Every Career Has a Story.
+            <h1 class="hero-editorial-title" style="font-size: 54px; margin-bottom: 12px;">
+                Resume Analysis Studio
             </h1>
             <p class="editorial-subtext">
-                Upload your resume in PDF format and paste the target job description. Our AI will dissect your qualifications, calculate ATS compatibility, and provide deep qualitative recommendations.
+                Upload your resume in PDF format and paste the target job description. Resumind will evaluate your qualifications, calculate ATS compatibility, and provide deep qualitative recommendations.
             </p>
         </div>
     """)
@@ -1446,7 +1374,7 @@ if st.session_state.page == "Analysis":
             st.error("Please enter a target job description.")
         else:
             try:
-                with st.spinner("Extracting text vectors and synthesizing analysis with Gemma AI..."):
+                with st.spinner("Extracting text and synthesizing analysis with Gemma AI..."):
                     # STEP 1: EXTRACT PDF TEXT
                     resume_text = extract_pdf_text(uploaded_file)
 
@@ -1765,7 +1693,7 @@ if (
         st.download_button(
             label="DOWNLOAD EXECUTIVE PDF REPORT ↓",
             data=pdf_report,
-            file_name=f"SOURA_RESUME_AI_Report_{datetime.now().strftime('%Y%m%d')}.pdf",
+            file_name=f"Resumind_AI_Report_{datetime.now().strftime('%Y%m%d')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -1778,11 +1706,11 @@ if (
     show_html("""
         <div class="luxury-footer">
             <div class="footer-brand-title">
-                SOURA RESUME <span>AI</span>
+                RESUMIND <span>AI</span>
             </div>
             <div class="footer-tagline">
-                Your Resume. Your Skills. Your Next Big Opportunity.<br>
-                © 2026 SOURA RESUME AI. All rights reserved.
+                Your Resume. Your Skills. Your Next Defining Opportunity.<br>
+                © 2026 Resumind AI. All rights reserved. • Contact: souradeepsaha190@gmail.com
             </div>
         </div>
     """)
