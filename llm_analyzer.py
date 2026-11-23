@@ -1,12 +1,12 @@
 
 import ollama
 
-MODEL_NAME = "soura-resume-ai:latest"
+MODEL_NAME = "resumind:latest"
 
 def analyse_resume(resume_text, job_description):
 
     prompt = f"""
-You are Soura Resume AI, an expert resume analyser.
+You are Resumind, an expert resume analyser.
 
 Analyse the candidate's resume against the job description.
 

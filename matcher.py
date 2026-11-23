@@ -9,7 +9,7 @@ from collections import Counter
 # 1. CONFIGURATION
 # ============================================================
 
-AI_MODEL = "soura-resume-ai:latest"
+AI_MODEL = "resumind:latest"
 
 
 # ============================================================

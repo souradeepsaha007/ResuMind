@@ -1,4 +1,4 @@
-# Soura Resume AI ✦
+# Resumind ✦
 
 An intelligent, AI-powered resume analyzer and career readiness platform built with **Streamlit**, **Gemma LLM (Ollama)**, and modern semantic skill matching algorithms.
 
@@ -6,12 +6,12 @@ An intelligent, AI-powered resume analyzer and career readiness platform built w
 
 ## 🌟 Overview
 
-Soura Resume AI evaluates candidate resumes against target job descriptions with precision. It identifies matched and missing competencies, calculates ATS-style compatibility scores, assesses resume completeness, and provides deep qualitative feedback and recommendations powered by local LLMs.
+Resumind evaluates candidate resumes against target job descriptions with precision. It identifies matched and missing competencies, calculates ATS-style compatibility scores, assesses resume completeness, and provides deep qualitative feedback and recommendations powered by local LLMs.
 
 ### Key Capabilities
 - **Resume Intelligence**: Automatically extracts candidate contact information, education, experience, projects, and certifications from text-based PDFs.
 - **Job Match Analysis**: Evaluates candidate skill sets against target role requirements using keyword extraction and taxonomy mapping.
-- **Gemma AI Insights**: Deep qualitative audit identifying strengths, gaps, and actionable improvement recommendations via Ollama.
+- **Gemma AI Insights**: Deep qualitative audit identifying strengths, gaps, and actionable improvement recommendations via Ollama (`resumind:latest`).
 - **Visual Analytics**: Interactive breakdowns of matched vs. missing skills and section completeness.
 - **PDF Report Generation**: Downloadable formal PDF audit reports generated with ReportLab.
 
@@ -20,7 +20,7 @@ Soura Resume AI evaluates candidate resumes against target job descriptions with
 ## 🛠️ Tech Stack
 
 - **Frontend & UI**: Streamlit (custom Mindly-inspired design system)
-- **AI & NLP**: Ollama (`gemma3:1b` / `soura-resume-ai`), PyMuPDF (PDF extraction), Scikit-Learn
+- **AI & NLP**: Ollama (`resumind:latest` / `gemma3:1b`), PyMuPDF (PDF extraction), Scikit-Learn
 - **Visualization**: Plotly Graph Objects
 - **Reporting**: ReportLab PDF Engine
 
@@ -30,8 +30,8 @@ Soura Resume AI evaluates candidate resumes against target job descriptions with
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-cd "AI resume analyser"
+git clone https://github.com/souradeepsaha007/AI-resume-.git
+cd "AI-resume-"
 ```
 
 ### 2. Set Up Virtual Environment & Dependencies

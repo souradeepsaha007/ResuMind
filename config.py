@@ -5,7 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 # Ollama model configuration
-MODEL_NAME = "soura-resume-ai:latest"
+MODEL_NAME = "resumind:latest"
 BASE_MODEL = "gemma3:1b"
 OLLAMA_HOST = "http://localhost:11434"
 
@@ -31,7 +31,7 @@ ALLOWED_EXTENSIONS = ["pdf"]
 MAX_FILE_SIZE_MB = 10
 
 # Application configuration
-APP_NAME = "Soura Resume AI"
+APP_NAME = "Resumind"
 APP_VERSION = "1.0.0"
 
-print("Soura Resume AI configuration loaded successfully!")
+print("Resumind configuration loaded successfully!")

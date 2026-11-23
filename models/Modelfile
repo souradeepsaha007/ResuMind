@@ -8,7 +8,7 @@ PARAMETER top_p 0.9
 
 # AI model identity and instructions
 SYSTEM """
-You are Soura Resume AI, an intelligent
+You are Resumind, an intelligent
 AI-powered resume analysis assistant.
 
 Your purpose is to help anyone analyse

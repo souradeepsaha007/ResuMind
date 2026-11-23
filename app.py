@@ -16,7 +16,7 @@ from llm_analyzer import analyse_resume
 # ==========================================================
 
 st.set_page_config(
-    page_title="Soura AI — Career Intelligence",
+    page_title="Resumind — Career Intelligence",
     page_icon="✦",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -865,7 +865,7 @@ def create_pdf_report(candidate, match_data, ai_analysis):
 
         story.append(
             Paragraph(
-                "<font color='#121212'><b>SOURA RESUME AI</b></font>",
+                "<font color='#121212'><b>RESUMIND</b></font>",
                 styles["Title"]
             )
         )
@@ -989,7 +989,7 @@ nav_col1, nav_col2, nav_col3 = st.columns([2.6, 2.2, 1.2], vertical_alignment="c
 with nav_col1:
     show_html("""
         <div class="brand-wrap">
-            <span>Soura AI</span><span class="brand-dot">°</span>
+            <span>Resumind</span><span class="brand-dot">°</span>
         </div>
     """)
 
@@ -1042,7 +1042,7 @@ if st.session_state.page == "Home":
             </h1>
 
             <p class="hero-description">
-                Soura AI helps you capture your professional value, organize your skills,
+                Resumind helps you capture your professional value, organize your skills,
                 and align with your target job — all in one calm, intelligent space.
             </p>
 
@@ -1192,7 +1192,7 @@ if st.session_state.page == "Home":
                 <div class="about-col">
                     <h4>Intelligent Career Preparation</h4>
                     <p>
-                        Soura Resume AI combines advanced natural language processing with local LLM 
+                        Resumind combines advanced natural language processing with local LLM 
                         reasoning to deliver an objective audit of your qualifications before recruiters review your application.
                     </p>
                 </div>
@@ -1211,11 +1211,11 @@ if st.session_state.page == "Home":
     show_html("""
         <div class="minimal-footer">
             <div class="footer-brand">
-                Soura AI<span style="font-size: 13px;">°</span>
+                Resumind<span style="font-size: 13px;">°</span>
             </div>
             <div class="footer-copy">
                 Your resume. Your skills. Your next opportunity.<br>
-                © 2026 Soura Resume AI. All rights reserved. • souradeepsaha190@gmail.com
+                © 2026 Resumind. All rights reserved. • souradeepsaha190@gmail.com
             </div>
         </div>
     """)
@@ -1755,7 +1755,7 @@ if (
         st.download_button(
             label="Download Professional PDF Report ↓",
             data=pdf_report,
-            file_name="Soura_Resume_AI_Report.pdf",
+            file_name="Resumind_Analysis_Report.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -1773,11 +1773,11 @@ if (
     show_html("""
         <div class="minimal-footer">
             <div class="footer-brand">
-                Soura AI<span style="font-size: 13px;">°</span>
+                Resumind<span style="font-size: 13px;">°</span>
             </div>
             <div class="footer-copy">
                 Your resume. Your skills. Your next opportunity.<br>
-                © 2026 Soura Resume AI. All rights reserved.
+                © 2026 Resumind. All rights reserved.
             </div>
         </div>
     """)
