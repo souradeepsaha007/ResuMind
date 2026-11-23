@@ -1,7 +1,6 @@
 
 import ollama
-
-MODEL_NAME = "resumind:latest"
+from config import OLLAMA_HOST, MODEL_NAME
 
 def analyse_resume(resume_text, job_description):
 
@@ -31,7 +30,8 @@ Only use information present in the resume.
 Do not invent qualifications or experience.
 """
 
-    response = ollama.chat(
+    client = ollama.Client(host=OLLAMA_HOST)
+    response = client.chat(
         model=MODEL_NAME,
         messages=[
             {"role": "user", "content": prompt}

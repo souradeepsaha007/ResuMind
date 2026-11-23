@@ -1,13 +1,18 @@
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env if present
+load_dotenv()
 
 # Main project directory
 BASE_DIR = Path(__file__).resolve().parent
 
 # Ollama model configuration
-MODEL_NAME = "resumind:latest"
-BASE_MODEL = "gemma3:1b"
-OLLAMA_HOST = "http://localhost:11434"
+MODEL_NAME = os.getenv("OLLAMA_MODEL", "resumind:latest")
+BASE_MODEL = os.getenv("OLLAMA_BASE_MODEL", "gemma3:1b")
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 # Project folders
 MODEL_DIR = BASE_DIR / "models"

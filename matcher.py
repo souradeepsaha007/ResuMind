@@ -3,13 +3,15 @@ import re
 import json
 import ollama
 from collections import Counter
+from config import OLLAMA_HOST, MODEL_NAME as AI_MODEL
 
 
 # ============================================================
 # 1. CONFIGURATION
 # ============================================================
 
-AI_MODEL = "resumind:latest"
+def get_ollama_client():
+    return ollama.Client(host=OLLAMA_HOST)
 
 
 # ============================================================
@@ -742,7 +744,7 @@ Return ONLY valid JSON:
 
     try:
 
-        response = ollama.chat(
+        response = get_ollama_client().chat(
             model=AI_MODEL,
             format="json",
             messages=[
@@ -832,7 +834,7 @@ Rules:
 
     try:
 
-        response = ollama.chat(
+        response = get_ollama_client().chat(
             model=AI_MODEL,
             format="json",
             messages=[
