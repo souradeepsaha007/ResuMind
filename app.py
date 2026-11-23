@@ -1,3 +1,16 @@
+# ==========================================================
+# 0. ASGI SERVERLESS ENTRYPOINT FOR VERCEL DEPLOYMENT
+# ==========================================================
+try:
+    from api.index import app as vercel_app
+    app = vercel_app
+    application = vercel_app
+    handler = vercel_app
+except Exception:
+    app = None
+    application = None
+    handler = None
+
 import re
 from io import BytesIO
 from datetime import datetime
