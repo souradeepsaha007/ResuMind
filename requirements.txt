@@ -1,0 +1,9 @@
+
+streamlit
+pymupdf
+ollama
+reportlab
+numpy
+pandas
+scikit-learn
+python-dotenv
