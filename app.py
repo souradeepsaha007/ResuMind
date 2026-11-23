@@ -24,7 +24,7 @@ st.set_page_config(
 
 
 # ==========================================================
-# 2. DESIGN SYSTEM & STYLES (INSPIRED BY MINDLY)
+# 2. DESIGN SYSTEM & STYLES (ENHANCED MINDLY AESTHETIC)
 # ==========================================================
 
 st.markdown("""
@@ -32,7 +32,11 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 /* --- Root & Background --- */
-html, body, .stApp {
+html {
+    scroll-behavior: smooth !important;
+}
+
+body, .stApp {
     background-color: #FAF9F5 !important;
     background-image: 
         radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(250, 249, 245, 0.6) 60%, rgba(243, 239, 231, 0.4) 100%),
@@ -72,7 +76,7 @@ header[data-testid="stHeader"] {
     align-items: baseline;
     gap: 2px;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 23px;
     letter-spacing: -0.03em;
     color: #111111;
 }
@@ -153,36 +157,37 @@ header[data-testid="stHeader"] {
 .hero-container {
     position: relative;
     text-align: center;
-    padding: 40px 10px 30px 10px;
-    margin-bottom: 20px;
+    padding: 35px 10px 25px 10px;
+    margin-bottom: 15px;
 }
 
 .hero-pill-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid rgba(0, 0, 0, 0.06);
     backdrop-filter: blur(10px);
     border-radius: 9999px;
-    padding: 6px 16px;
+    padding: 6px 18px;
     font-size: 12.5px;
     font-weight: 600;
     letter-spacing: 0.04em;
     color: #555555;
     text-transform: uppercase;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .hero-heading {
     font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 64px;
+    font-size: 66px;
     line-height: 1.08;
     color: #121212;
     font-weight: 400;
     letter-spacing: -0.02em;
-    margin: 0 auto 20px auto;
-    max-width: 820px;
+    margin: 0 auto 18px auto;
+    max-width: 840px;
 }
 
 .hero-heading em {
@@ -193,19 +198,19 @@ header[data-testid="stHeader"] {
 }
 
 .hero-description {
-    font-size: 17px;
+    font-size: 17.5px;
     line-height: 1.7;
     color: #666666;
-    max-width: 620px;
-    margin: 0 auto 30px auto;
+    max-width: 640px;
+    margin: 0 auto 28px auto;
     font-weight: 400;
 }
 
 /* --- Rotating Circular Stamp Badge --- */
 .stamp-badge-wrap {
     position: absolute;
-    top: 15px;
-    right: 25px;
+    top: 10px;
+    right: 20px;
     width: 100px;
     height: 100px;
 }
@@ -230,31 +235,56 @@ header[data-testid="stHeader"] {
     color: #121212;
 }
 
-/* --- Floating Hero Showcase --- */
+/* --- Floating Keyframe Micro-Animations --- */
+@keyframes floatGentle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-7px); }
+}
+
+@keyframes floatGentleAlt {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(7px); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.06), 0 0 1px 1px rgba(0, 0, 0, 0.03); }
+    50% { box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.09), 0 0 1px 1px rgba(0, 0, 0, 0.05); }
+}
+
+.float-widget-left {
+    animation: floatGentle 5.5s ease-in-out infinite;
+}
+
+.float-widget-right {
+    animation: floatGentleAlt 6.5s ease-in-out infinite;
+}
+
+/* Floating Hero Showcase */
 .hero-stage {
     position: relative;
     max-width: 1000px;
-    margin: 40px auto 30px auto;
-    padding: 20px 0 30px 0;
+    margin: 30px auto 20px auto;
+    padding: 10px 0 20px 0;
 }
 
 /* Floating Glass Cards */
 .glass-widget {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 22px;
-    padding: 20px 22px;
+    border-radius: 24px;
+    padding: 22px 24px;
     box-shadow: 
-        0 20px 40px -15px rgba(0, 0, 0, 0.05),
+        0 20px 45px -15px rgba(0, 0, 0, 0.05),
         0 0 1px 1px rgba(0, 0, 0, 0.03);
     text-align: left;
-    transition: transform 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-widget:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px) !important;
+    box-shadow: 0 25px 55px -15px rgba(0, 0, 0, 0.09);
 }
 
 .glass-widget h4 {
@@ -268,7 +298,7 @@ header[data-testid="stHeader"] {
 .glass-widget p {
     font-size: 13px;
     color: #737373;
-    line-height: 1.5;
+    line-height: 1.55;
     margin: 0;
 }
 
@@ -332,13 +362,11 @@ header[data-testid="stHeader"] {
 
 /* Central Composition */
 .center-showcase-wrap {
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(248, 246, 240, 0.7) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.95);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 240, 0.75) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.98);
     border-radius: 32px;
     padding: 36px 30px;
-    box-shadow: 
-        0 25px 50px -20px rgba(0, 0, 0, 0.06),
-        0 0 1px 1px rgba(0, 0, 0, 0.03);
+    animation: pulseGlow 8s ease-in-out infinite;
     margin: 15px 0;
     position: relative;
     overflow: hidden;
@@ -353,7 +381,7 @@ header[data-testid="stHeader"] {
 }
 
 .center-pill-item {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     border: 1px solid rgba(0, 0, 0, 0.06);
     backdrop-filter: blur(12px);
     border-radius: 9999px;
@@ -405,10 +433,145 @@ header[data-testid="stHeader"] {
     gap: 8px;
 }
 
+/* --- Continuous Infinite Horizontal Marquee Ticker --- */
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    padding: 14px 0;
+    margin: 20px 0 35px 0;
+    background: rgba(255, 255, 255, 0.65);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 22px;
+    animation: scrollMarquee 34s linear infinite;
+}
+
+.marquee-track:hover {
+    animation-play-state: paused;
+}
+
+.marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4A4A4A;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    padding: 7px 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+@keyframes scrollMarquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* --- Resumind Deep-Dive Stage Grid --- */
+.stage-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 28px 0;
+}
+
+.stage-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 22px;
+    padding: 26px 22px;
+    box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.03);
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.stage-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.07);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.stage-number {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 30px;
+    color: #B8AC99;
+    font-style: italic;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.stage-card h4 {
+    font-size: 16.5px;
+    font-weight: 600;
+    color: #121212;
+    margin: 0 0 8px 0;
+}
+
+.stage-card p {
+    font-size: 13.5px;
+    color: #666666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Resumind Architecture Pillars Banner --- */
+.resumind-banner {
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(246, 244, 238, 0.85) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 28px;
+    padding: 36px 40px;
+    margin: 20px 0 40px 0;
+    box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.04);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.resumind-banner-item {
+    text-align: left;
+}
+
+.resumind-banner-item .item-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8C8270;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.resumind-banner-item h4 {
+    font-size: 17.5px;
+    font-weight: 600;
+    color: #121212;
+    margin: 0 0 6px 0;
+}
+
+.resumind-banner-item p {
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.65;
+    margin: 0;
+}
+
 /* --- Section Headings --- */
 .section-header-wrap {
     text-align: center;
-    margin: 60px 0 32px 0;
+    margin: 55px 0 32px 0;
 }
 
 .section-tag {
@@ -423,7 +586,7 @@ header[data-testid="stHeader"] {
 
 .section-title-serif {
     font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    font-size: 38px;
+    font-size: 40px;
     line-height: 1.2;
     color: #121212;
     font-weight: 400;
@@ -431,11 +594,11 @@ header[data-testid="stHeader"] {
 }
 
 .section-subtext {
-    font-size: 15.5px;
+    font-size: 16px;
     color: #6E6E6E;
-    max-width: 580px;
+    max-width: 620px;
     margin: 0 auto;
-    line-height: 1.6;
+    line-height: 1.65;
 }
 
 /* --- Feature Cards Grid --- */
@@ -451,7 +614,7 @@ header[data-testid="stHeader"] {
 }
 
 .feature-card-clean:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.1);
 }
@@ -534,7 +697,7 @@ header[data-testid="stHeader"] {
 }
 
 .footer-brand {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: #121212;
@@ -1011,7 +1174,7 @@ with nav_col3:
 
 
 # ==========================================================
-# 10. HOMEPAGE VIEW (MINDLY AESTHETIC HERO & SECTIONS)
+# 10. HOMEPAGE VIEW (ENHANCED MINDLY AESTHETIC & RESUMIND DEEP-DIVE)
 # ==========================================================
 
 if st.session_state.page == "Home":
@@ -1056,13 +1219,13 @@ if st.session_state.page == "Home":
             st.session_state.page = "Analysis"
             st.rerun()
 
-    # Floating 3D Showcase (Centerpiece inspired by Mindly artwork)
+    # Floating 3D Showcase (Centerpiece inspired by Mindly artwork with micro-animations)
     show_html("""
         <div class="hero-stage">
             <div style="display: grid; grid-template-columns: 260px 1fr 260px; gap: 20px; align-items: center;">
 
-                <!-- Floating Left Card -->
-                <div class="glass-widget">
+                <!-- Floating Left Card with gentle float animation -->
+                <div class="glass-widget float-widget-left">
                     <div class="soundwave-box">
                         <span></span><span></span><span></span><span></span><span></span>
                     </div>
@@ -1070,7 +1233,7 @@ if st.session_state.page == "Home":
                     <p>Detect keyword alignment and close critical gaps effortlessly.</p>
                 </div>
 
-                <!-- Center Showcase -->
+                <!-- Center Showcase with breathing glow -->
                 <div class="center-showcase-wrap">
                     <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #8C8270; font-weight: 700; text-align: center;">
                         INTELLIGENT PROFILE BENCHMARK
@@ -1094,8 +1257,8 @@ if st.session_state.page == "Home":
                     </div>
                 </div>
 
-                <!-- Floating Right Card -->
-                <div class="glass-widget">
+                <!-- Floating Right Card with gentle float animation -->
+                <div class="glass-widget float-widget-right">
                     <div class="avatar-stack-wrap">
                         <span class="avatar-circle av-1">JS</span>
                         <span class="avatar-circle av-2">MR</span>
@@ -1134,7 +1297,100 @@ if st.session_state.page == "Home":
         </div>
     """)
 
-    # Features Section
+    # CONTINUOUS INFINITE SCROLLING TICKER (MARQUEE ANIMATION)
+    show_html("""
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <div class="marquee-item">✦ ATS Compatibility Auditing</div>
+                <div class="marquee-item">✦ Deep Semantic Taxonomy</div>
+                <div class="marquee-item">✦ Gemma 3 Local Reasoning</div>
+                <div class="marquee-item">✦ Real-Time Gap Identification</div>
+                <div class="marquee-item">✦ Multi-Layer PDF Extraction</div>
+                <div class="marquee-item">✦ Actionable Improvement Roadmaps</div>
+                <div class="marquee-item">✦ 100% Private On-Device AI</div>
+                <div class="marquee-item">✦ Executive ReportLab PDF Export</div>
+                <!-- Duplicate items for seamless continuous infinite scroll -->
+                <div class="marquee-item">✦ ATS Compatibility Auditing</div>
+                <div class="marquee-item">✦ Deep Semantic Taxonomy</div>
+                <div class="marquee-item">✦ Gemma 3 Local Reasoning</div>
+                <div class="marquee-item">✦ Real-Time Gap Identification</div>
+                <div class="marquee-item">✦ Multi-Layer PDF Extraction</div>
+                <div class="marquee-item">✦ Actionable Improvement Roadmaps</div>
+                <div class="marquee-item">✦ 100% Private On-Device AI</div>
+                <div class="marquee-item">✦ Executive ReportLab PDF Export</div>
+            </div>
+        </div>
+    """)
+
+    # DEDICATED SECTION: DESCRIPTION OF RESUMIND AI RESUME ANALYSIS
+    show_html("""
+        <div class="section-header-wrap" style="margin-top: 45px; margin-bottom: 25px;">
+            <span class="section-tag">ENGINE ARCHITECTURE</span>
+            <h2 class="section-title-serif">Inside Resumind: Intelligent Resume Analysis</h2>
+            <p class="section-subtext">
+                Resumind bridges the gap between your resume and modern recruiter expectations by uniting deterministic skill-taxonomy matching with local Gemma language model reasoning.
+            </p>
+        </div>
+
+        <!-- 4-Stage Sequential Pipeline Grid -->
+        <div class="stage-grid">
+            <div class="stage-card">
+                <span class="stage-number">01</span>
+                <h4>Structural PDF Ingestion</h4>
+                <p>
+                    Extracts raw text, formatting hierarchies, contact vectors, educational credentials, and dated career milestones directly from text-based PDFs without information loss.
+                </p>
+            </div>
+            <div class="stage-card">
+                <span class="stage-number">02</span>
+                <h4>Taxonomy & Skill Mapping</h4>
+                <p>
+                    Cross-references candidate experience against over 1,000+ standardized technical and leadership competencies to identify matched strengths and missing role requirements.
+                </p>
+            </div>
+            <div class="stage-card">
+                <span class="stage-number">03</span>
+                <h4>Local Gemma Reasoning</h4>
+                <p>
+                    Executes private, on-device intelligence via Gemma LLM to diagnose qualitative impact, candidate voice, real-world experience depth, and specific resume weak spots.
+                </p>
+            </div>
+            <div class="stage-card">
+                <span class="stage-number">04</span>
+                <h4>Scoring & Report Delivery</h4>
+                <p>
+                    Calculates a transparent keyword suitability score, formats interactive visual analytics, and compiles a comprehensive executive PDF ready for download.
+                </p>
+            </div>
+        </div>
+
+        <!-- Architectural Highlights Banner -->
+        <div class="resumind-banner">
+            <div class="resumind-banner-item">
+                <span class="item-badge">PRIVACY FIRST</span>
+                <h4>100% On-Device Inference</h4>
+                <p>
+                    Your confidential resume and personal data stay entirely on your machine. All AI evaluation runs through local Ollama models with zero external cloud telemetry.
+                </p>
+            </div>
+            <div class="resumind-banner-item">
+                <span class="item-badge">OBJECTIVE BENCHMARKS</span>
+                <h4>Direct ATS Alignment</h4>
+                <p>
+                    Evaluates applicant profiles against the exact semantic and keyword screening heuristics utilized by modern enterprise Applicant Tracking Systems.
+                </p>
+            </div>
+            <div class="resumind-banner-item">
+                <span class="item-badge">ZERO HALLUCINATIONS</span>
+                <h4>Grounded Evaluation</h4>
+                <p>
+                    Strict temperature controls and prompt engineering ensure feedback is strictly anchored to facts in your resume — never inventing qualifications.
+                </p>
+            </div>
+        </div>
+    """)
+
+    # Capabilities / Features Section
     show_html("""
         <div class="section-header-wrap">
             <span class="section-tag">CAPABILITIES</span>
