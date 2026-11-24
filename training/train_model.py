@@ -1,22 +1,48 @@
-
 import os
+import sys
+from pathlib import Path
 import torch
 
-from datasets import load_dataset
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    BitsAndBytesConfig,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForLanguageModeling
-)
+# ==========================================
+# 0. RESOLVE IMPORT SHADOWING
+# ==========================================
+# Prevent local 'training/datasets' folder from shadowing HuggingFace 'datasets' library
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+if _script_dir in sys.path:
+    sys.path.remove(_script_dir)
 
-from peft import (
-    LoraConfig,
-    get_peft_model,
-    prepare_model_for_kbit_training
-)
+# Ensure project root is in sys.path for internal modules
+_project_root = os.path.abspath(os.path.join(_script_dir, ".."))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+try:
+    from datasets import load_dataset
+except ImportError as err:
+    raise ImportError(
+        f"Failed to load HuggingFace 'datasets' library: {err}\n"
+        "Please run: pip install datasets"
+    )
+
+try:
+    from transformers import (
+        AutoTokenizer,
+        AutoModelForCausalLM,
+        BitsAndBytesConfig,
+        TrainingArguments,
+        Trainer,
+        DataCollatorForLanguageModeling
+    )
+    from peft import (
+        LoraConfig,
+        get_peft_model,
+        prepare_model_for_kbit_training
+    )
+except ImportError as err:
+    raise ImportError(
+        f"Failed to import transformers/peft: {err}\n"
+        "Please run: pip install transformers peft accelerate"
+    )
 
 
 # ==========================================
@@ -25,7 +51,11 @@ from peft import (
 
 MODEL_NAME = "google/gemma-3-1b-it"
 
-PROJECT_DIR = "/content/AI_Resume_Analyser"
+# Auto-detect project directory (Google Colab vs Local Windows/Linux)
+if os.path.exists("/content/AI_Resume_Analyser"):
+    PROJECT_DIR = "/content/AI_Resume_Analyser"
+else:
+    PROJECT_DIR = _project_root
 
 TRAIN_FILE = os.path.join(
     PROJECT_DIR, "dataset", "train.jsonl"
@@ -36,40 +66,51 @@ VALIDATION_FILE = os.path.join(
 )
 
 OUTPUT_DIR = os.path.join(
-    PROJECT_DIR, "models", "soura-resume-ai-lora"
+    PROJECT_DIR, "models", "resumind-ai-lora"
 )
 
 MAX_LENGTH = 1024
 
 
 # ==========================================
-# 2. CHECK GPU
+# 2. CHECK HARDWARE & ACCELERATION
 # ==========================================
 
-if not torch.cuda.is_available():
-    raise RuntimeError(
-        "GPU not detected. Enable GPU in Google Colab."
-    )
+has_cuda = torch.cuda.is_available()
 
-print("GPU detected:", torch.cuda.get_device_name(0))
+if has_cuda:
+    device_name = torch.cuda.get_device_name(0)
+    print(f"GPU detected: {device_name}")
+else:
+    print("Notice: CUDA GPU not detected. Training will run on CPU or in Google Colab with GPU runtime.")
 
 
 # ==========================================
-# 3. CHECK DATASET FILES
+# 3. VERIFY DATASET FILES
 # ==========================================
 
 if not os.path.exists(TRAIN_FILE):
-    raise FileNotFoundError(TRAIN_FILE)
+    raise FileNotFoundError(
+        f"Training dataset not found at: {TRAIN_FILE}\n"
+        "Please ensure dataset/train.jsonl exists."
+    )
 
 if not os.path.exists(VALIDATION_FILE):
-    raise FileNotFoundError(VALIDATION_FILE)
+    raise FileNotFoundError(
+        f"Validation dataset not found at: {VALIDATION_FILE}\n"
+        "Please ensure dataset/validation.jsonl exists."
+    )
+
+print("Dataset paths verified:")
+print(f" - Train: {TRAIN_FILE}")
+print(f" - Validation: {VALIDATION_FILE}")
 
 
 # ==========================================
 # 4. LOAD TOKENIZER
 # ==========================================
 
-print("Loading tokenizer...")
+print(f"\nLoading tokenizer for {MODEL_NAME}...")
 
 tokenizer = AutoTokenizer.from_pretrained(
     MODEL_NAME
@@ -95,31 +136,41 @@ dataset = load_dataset(
     }
 )
 
-print(dataset)
+print("Dataset summary:", dataset)
 
 
 # ==========================================
-# 6. PREPARE TRAINING TEXT
+# 6. PREPARE TRAINING TEXT & CHAT TEMPLATE
 # ==========================================
 
 def format_example(example):
-
     messages = example["messages"]
 
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=False
-    )
+    # Use tokenizer's chat template or format messages as plain conversational text
+    if hasattr(tokenizer, "apply_chat_template") and tokenizer.chat_template:
+        try:
+            text = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=False
+            )
+            return {"text": text}
+        except Exception:
+            pass
 
-    return {"text": text}
+    # Fallback message formatter
+    formatted = []
+    for msg in messages:
+        role = msg.get("role", "user").capitalize()
+        content = msg.get("content", "")
+        formatted.append(f"<|start_header_id|>{role}<|end_header_id|>\n{content}<|eot_id|>")
+    return {"text": "\n".join(formatted)}
 
 
 dataset = dataset.map(format_example)
 
 
 def tokenize_example(example):
-
     return tokenizer(
         example["text"],
         truncation=True,
@@ -137,39 +188,55 @@ print("Dataset preprocessing completed!")
 
 
 # ==========================================
-# 7. 4-BIT QUANTIZATION
+# 7. QUANTIZATION & MODEL CONFIGURATION
 # ==========================================
 
-bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.float16,
-    bnb_4bit_use_double_quant=True
-)
+use_4bit = False
+bnb_config = None
+
+if has_cuda:
+    try:
+        import bitsandbytes as bnb
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True
+        )
+        use_4bit = True
+        print("BitsAndBytes 4-bit NF4 quantization enabled.")
+    except Exception as bnb_err:
+        print(f"Notice: bitsandbytes not loaded ({bnb_err}). Using FP16.")
 
 
 # ==========================================
 # 8. LOAD GEMMA BASE MODEL
 # ==========================================
 
-print("Loading Gemma 3:1b...")
+print(f"\nLoading base model: {MODEL_NAME}...")
+
+model_load_args = {
+    "device_map": "auto" if has_cuda else "cpu"
+}
+
+if has_cuda:
+    model_load_args["torch_dtype"] = torch.float16
+    if use_4bit and bnb_config is not None:
+        model_load_args["quantization_config"] = bnb_config
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
-    quantization_config=bnb_config,
-    device_map="auto",
-    torch_dtype=torch.float16
+    **model_load_args
 )
 
 model.config.use_cache = False
 
-model = prepare_model_for_kbit_training(
-    model
-)
+if use_4bit:
+    model = prepare_model_for_kbit_training(model)
 
 
 # ==========================================
-# 9. CONFIGURE LORA
+# 9. CONFIGURE LORA ADAPTER
 # ==========================================
 
 lora_config = LoraConfig(
@@ -194,6 +261,7 @@ model = get_peft_model(
     lora_config
 )
 
+print("\nLoRA trainable parameters:")
 model.print_trainable_parameters()
 
 
@@ -211,37 +279,24 @@ data_collator = DataCollatorForLanguageModeling(
 # 11. TRAINING CONFIGURATION
 # ==========================================
 
+training_optimizer = "paged_adamw_8bit" if use_4bit else "adamw_torch"
+
 training_args = TrainingArguments(
-
     output_dir=OUTPUT_DIR,
-
     num_train_epochs=3,
-
     per_device_train_batch_size=1,
-
     per_device_eval_batch_size=1,
-
     gradient_accumulation_steps=4,
-
     learning_rate=2e-4,
-
-    fp16=True,
-
+    fp16=has_cuda,
     logging_steps=5,
-
     save_strategy="epoch",
-
     save_total_limit=2,
-
     warmup_ratio=0.03,
-
     weight_decay=0.01,
-
-    gradient_checkpointing=True,
-
+    gradient_checkpointing=has_cuda,
     report_to="none",
-
-    optim="paged_adamw_8bit"
+    optim=training_optimizer
 )
 
 
@@ -250,17 +305,11 @@ training_args = TrainingArguments(
 # ==========================================
 
 trainer = Trainer(
-
     model=model,
-
     args=training_args,
-
     train_dataset=tokenized_dataset["train"],
-
     eval_dataset=tokenized_dataset["validation"],
-
     data_collator=data_collator
-
 )
 
 
@@ -268,7 +317,7 @@ trainer = Trainer(
 # 13. START TRAINING
 # ==========================================
 
-print("\nStarting Soura Resume AI training...\n")
+print("\nStarting Resumind AI model fine-tuning...\n")
 
 trainer.train()
 
@@ -277,7 +326,7 @@ trainer.train()
 # 14. EVALUATE MODEL
 # ==========================================
 
-print("\nEvaluating trained model...")
+print("\nEvaluating fine-tuned model...")
 
 evaluation = trainer.evaluate()
 
@@ -288,14 +337,13 @@ print("Evaluation results:", evaluation)
 # 15. SAVE TRAINED MODEL
 # ==========================================
 
-print("\nSaving trained LoRA adapter...")
+print(f"\nSaving trained LoRA adapter to: {OUTPUT_DIR}...")
 
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 model.save_pretrained(OUTPUT_DIR)
-
 tokenizer.save_pretrained(OUTPUT_DIR)
 
-print("\n================================")
-print("SOURA RESUME AI TRAINING COMPLETE")
-print("================================")
-
-print("Saved model:", OUTPUT_DIR)
+print("\n=================================")
+print("RESUMIND AI MODEL TRAINING COMPLETE")
+print("=================================")
+print(f"Saved LoRA adapter at: {OUTPUT_DIR}")
