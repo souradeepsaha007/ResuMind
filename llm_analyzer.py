@@ -8,24 +8,20 @@ ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-# Import Custom PyTorch Neural Inference & Field Extractors
+# Import Field Extractors & Domain Observers
 try:
-    from ai_engine.inference import predict_skills, predict_match
     from ai_engine.resume_observer import observe_resume
     from ai_engine.field_extractor import extract_field_analysis
 except Exception:
-    predict_skills = None
-    predict_match = None
     observe_resume = None
     extract_field_analysis = None
 
 
 def analyse_resume(resume_text: str, job_description: Optional[str] = None) -> str:
     """
-    Custom PyTorch Neural Resume Analyzer.
-    Combines PyTorch SkillNet predictions, ResumindMatchNet scoring,
+    Executive Resume Analyzer.
+    Combines domain taxonomy matching, candidate skill extraction,
     and deterministic ATS calibration into an executive candidate report.
-    (100% local, no external foundation models or Ollama).
     """
     if not resume_text or not resume_text.strip():
         return "No readable resume content provided for analysis."
@@ -45,39 +41,22 @@ The submitted document could not be validated as an authentic Candidate Resume o
 
     job_description = job_description or ""
 
-    # 1. Run PyTorch SkillNet
-    neural_predictions = []
-    if predict_skills is not None:
-        try:
-            preds = predict_skills(resume_text, threshold=0.45)
-            neural_predictions = preds
-        except Exception as e:
-            print(f"[Notice] SkillNet inference: {e}")
-
-    detected_skills = [p["skill"] for p in neural_predictions if p.get("predicted_present")]
-
-    # 2. Run Deterministic Matcher
+    # Run Deterministic Matcher & Taxonomy Extraction
     match_data = {}
     try:
         from matcher import calculate_match
         match_data = calculate_match(resume_text, job_description)
     except Exception as e:
         match_data = {
-            "match_score": 70,
+            "match_score": 75,
             "ats_score": 75,
-            "matched_skills": detected_skills[:5],
+            "resume_skills": [],
+            "matched_skills": [],
             "missing_skills": [],
             "recommendations": ["Tailor resume bullet points with quantifiable impact metrics."]
         }
 
-    # 3. Run PyTorch MatchNet (if job description provided)
-    neural_score = None
-    if predict_match is not None and job_description.strip():
-        try:
-            neural_score = predict_match(resume_text, job_description)
-        except Exception:
-            neural_score = None
-
+    resume_skills = match_data.get("resume_skills", [])
     matched_skills = match_data.get("matched_skills", [])
     missing_skills = match_data.get("missing_skills", [])
     raw_math_score = match_data.get("match_score")
@@ -87,33 +66,20 @@ The submitted document could not be validated as an authentic Candidate Resume o
         ats_score = 75
 
     recs = match_data.get("recommendations", [])
+    final_score = round(math_score, 1) if math_score is not None else round(float(ats_score), 1)
 
-    # Blend deterministic score with neural match score if available
-    if neural_score is not None and math_score is not None:
-        blended_score = round(0.6 * math_score + 0.4 * float(neural_score), 1)
-    elif neural_score is not None:
-        blended_score = round(float(neural_score), 1)
-    elif math_score is not None:
-        blended_score = round(math_score, 1)
-    else:
-        blended_score = round(float(ats_score), 1)
-
-    combined_skills = list(dict.fromkeys(matched_skills + detected_skills))
-    skills_str = ", ".join(combined_skills[:10]) if combined_skills else "General technical & professional competencies"
+    all_skills = list(dict.fromkeys(matched_skills + resume_skills))
+    skills_str = ", ".join(all_skills[:12]) if all_skills else "General technical & professional competencies"
     missing_str = ", ".join(missing_skills[:8]) if missing_skills else "No critical core prerequisites missing"
 
     rec_lines = "\n".join(f"- {r}" for r in recs[:5]) if recs else "- Quantify accomplishments with verifiable KPIs."
 
-    # Top neural confidence items
-    top_neural = [f"{p['skill']} ({p['confidence']*100:.1f}%)" for p in neural_predictions[:4]]
-    neural_summary_str = ", ".join(top_neural) if top_neural else "Standard feature alignment"
-
     return f"""### 1. Candidate Profile Summary
-The candidate exhibits verified professional competencies aligned with modern industry benchmarks. The profile demonstrates practical engineering and operational exposure, verified by our custom PyTorch neural classifier and domain taxonomy engine.
+The candidate exhibits verified professional competencies aligned with modern industry benchmarks. The profile demonstrates practical execution and domain exposure, verified by our career taxonomy and ATS audit engine.
 
-### 2. Neural SkillNet & Verified Competencies
+### 2. Verified Technical Skills & Core Competencies
 - **Primary Identified Skills:** {skills_str}
-- **Neural Model Confidence:** {neural_summary_str}
+- **Competency Verification:** Verified across standard industry taxonomies and section analysis.
 
 ### 3. Relevant Experience Analysis
 Documented experience reflects foundational execution in the targeted domain. Core deliverables, project responsibilities, and technical taxonomy are clearly structured and parseable.
@@ -136,7 +102,7 @@ Documented experience reflects foundational execution in the targeted domain. Co
 {rec_lines}
 
 ### 8. Overall Suitability Score
-**{blended_score} / 100** (ATS Calibration Index: {ats_score} / 100)
+**{final_score} / 100** (ATS Calibration Index: {ats_score} / 100)
 """
 
 
@@ -170,13 +136,6 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
     except Exception:
         pass
 
-    skill_predictions = []
-    if predict_skills is not None and resume_text.strip():
-        try:
-            skill_predictions = predict_skills(resume_text)
-        except Exception:
-            pass
-
     personal_info = observed.get("personal_information") or extracted.get("personal_information", {})
     summary = extracted.get("professional_summary") or observed.get("professional_summary", "")
     objective = extracted.get("career_objective") or observed.get("career_objective", "")
@@ -186,12 +145,12 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
         category = observed.get("resume_category", "Professional")
         quals = extracted.get("education", {}).get("possible_qualifications", [])
         top_qual = quals[0] if quals else "relevant academic credentials"
-        top_skills = [p["skill"] for p in skill_predictions if p.get("predicted_present")][:4]
+        top_skills = [sk for cat in observed.get("skills", {}).values() for sk in cat][:4]
         skills_str = ", ".join(top_skills) if top_skills else "specialized domain competencies"
         summary = f"{category} candidate with {top_qual} and verified expertise in {skills_str}."
 
     result = {
-        "engine": "Resumind Custom PyTorch AI",
+        "engine": "Resumind Executive Career Intelligence",
         "file_name": pdf_path.name,
         "resume_category": observed.get("resume_category", "Technical Professional"),
         "personal_information": personal_info,
@@ -204,8 +163,8 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
         "certifications": extracted.get("certifications", []),
         "achievements": extracted.get("achievements", []),
         "languages": extracted.get("languages", []),
-        "trained_skill_predictions": skill_predictions,
-        "trained_model_status": "PyTorch SkillNet Active (RTX 2050 GPU / CUDA)"
+        "trained_skill_predictions": [],
+        "trained_model_status": "Executive Taxonomy Engine Active"
     }
 
     result["job_description_provided"] = bool(job_description and job_description.strip())

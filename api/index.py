@@ -974,7 +974,7 @@ def health_check():
         "status": "healthy",
         "service": "Resumind AI",
         "version": "2.0.0",
-        "engine": "Custom PyTorch Neural Architecture (SkillNet & MatchNet)"
+        "engine": "Resumind Executive Career Intelligence Engine"
     }
 
 

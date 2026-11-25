@@ -675,11 +675,6 @@ def calculate_job_match(resume_result, job_description):
             if skill not in resume_skills:
                 resume_skills.append(skill)
 
-    # Merge verified skills from trained PyTorch SkillNet
-    for pred in resume_result.get("trained_skill_predictions", []):
-        if pred.get("predicted_present") and pred.get("skill") not in resume_skills:
-            resume_skills.append(pred["skill"])
-
     required_skills = extract_job_skills(job_description)
 
     resume_set = {
@@ -1002,8 +997,8 @@ if st.session_state.page == "Home":
         ),
         (
             "04",
-            "Neural SkillNet",
-            "Use your custom PyTorch neural model trained on your RTX 2050 GPU."
+            "Career Path Radar",
+            "Identify top matching job roles, fit score reasoning, and direct application links."
         ),
         (
             "05",
@@ -1209,14 +1204,11 @@ if st.session_state.page == "Analysis":
 
                     else:
 
-                        all_skills = [
+                        all_skills = list(dict.fromkeys(
                             skill
                             for values in soura_result.get("skills", {}).values()
                             for skill in values
-                        ]
-                        for pred in soura_result.get("trained_skill_predictions", []):
-                            if pred.get("predicted_present") and pred.get("skill") not in all_skills:
-                                all_skills.append(pred["skill"])
+                        ))
 
                         match_data = {
                             "resume_skills": all_skills,
@@ -1295,8 +1287,7 @@ if (
     )
 
     st.caption(
-        f"Analysis engine: {data['engine']} | "
-        f"Model status: {data.get('trained_model_status', 'Not available')}"
+        f"Analysis engine: {data.get('engine', 'Resumind Executive Career Intelligence')}"
     )
 
     # ------------------------------------------------------
@@ -1317,9 +1308,7 @@ if (
     if not candidate_skills_for_pred and data.get("skills"):
         for slist in data["skills"].values():
             candidate_skills_for_pred.extend(slist)
-    for p in data.get("trained_skill_predictions", []):
-        if p.get("predicted_present") and p.get("skill") not in candidate_skills_for_pred:
-            candidate_skills_for_pred.append(p["skill"])
+    candidate_skills_for_pred = list(dict.fromkeys(candidate_skills_for_pred))
 
     predicted_roles = predict_job_options(
         candidate_skills=candidate_skills_for_pred,
@@ -1462,7 +1451,7 @@ if (
         info_c1, info_c2 = st.columns([2.5, 1])
         with info_c1:
             st.info(
-                "💡 **No Target Job Description Provided** — General resume analysis and neural skill predictions are displayed below. "
+                "💡 **No Target Job Description Provided** — General resume analysis and verified skill competencies are displayed below. "
                 "Paste a job description in the analysis studio to calculate real-time match percentage, keyword gaps, and ATS alignment."
             )
         with info_c2:
@@ -1761,40 +1750,6 @@ if (
         st.write(
             data["languages"]
             or "No language section detected."
-        )
-
-    # ------------------------------------------------------
-    # TRAINED MODEL PREDICTIONS
-    # ------------------------------------------------------
-
-    if data.get("trained_skill_predictions"):
-
-        st.divider()
-
-        st.markdown("### ✦ Resumind Neural Network Predictions")
-
-        st.caption(
-            "Predictions from your custom PyTorch SkillNet trained on your RTX 2050 GPU."
-        )
-
-        st.dataframe(
-            data["trained_skill_predictions"],
-            width="stretch",
-            hide_index=True
-        )
-
-    elif data.get("trained_model_warning"):
-
-        st.warning(
-            "The trained model could not run: "
-            + data["trained_model_warning"]
-        )
-
-    else:
-
-        st.info(
-            "Custom PyTorch SkillNet model is not trained yet. "
-            "Run 'python build_model.py' to train it."
         )
 
     # ------------------------------------------------------
@@ -2208,9 +2163,7 @@ if st.session_state.page == "CareerPaths":
         if not active_skills and res["soura_result"].get("skills"):
             for slist in res["soura_result"]["skills"].values():
                 active_skills.extend(slist)
-        for p in res["soura_result"].get("trained_skill_predictions", []):
-            if p.get("predicted_present") and p.get("skill") not in active_skills:
-                active_skills.append(p["skill"])
+        active_skills = list(dict.fromkeys(active_skills))
 
         st.info(
             f"🎯 **Personalized Career Predictions Active:** Analyzed for **{active_name}** ({active_cat}) "
