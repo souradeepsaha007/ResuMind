@@ -842,10 +842,10 @@ def calculate_match(resume_text, job_description):
         job_description
     )
 
-    # B. Gemma skill extraction
+    # B. Neural engine skill extraction
 
     ai_resume_skills, ai_job_skills = (
-        extract_skills_with_gemma(
+        extract_skills_with_neural_model(
             resume_text,
             job_description
         )
@@ -900,9 +900,9 @@ def calculate_match(resume_text, job_description):
 
         match_score = None
 
-    # F. Extract resume details using Gemma
+    # F. Extract resume details using Neural Engine
 
-    resume_details = extract_resume_details_with_gemma(
+    resume_details = extract_resume_details_with_neural_engine(
         resume_text
     )
 
@@ -1036,7 +1036,7 @@ def calculate_match(resume_text, job_description):
 
         "resume_details": resume_details,
 
-        "extraction_method": "Dictionary + Gemma AI"
+        "extraction_method": "Dictionary + Resumind Neural Engine"
 
     }
 
