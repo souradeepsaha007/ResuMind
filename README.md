@@ -29,7 +29,7 @@ Deploy to **Streamlit Community Cloud** so anyone can use it from any laptop, ph
 
 1. Go to **[share.streamlit.io](https://share.streamlit.io/)** and sign in with GitHub.
 2. Click **"New app"**.
-3. Select your repository: `souradeepsaha007/AI-resume-`.
+3. Select your repository: `souradeepsaha007/ResuMind`.
 4. Branch: `main`
 5. Main file path: `app.py`
 6. Click **"Deploy!"**
@@ -42,8 +42,8 @@ Deploy to **Streamlit Community Cloud** so anyone can use it from any laptop, ph
 #### On Windows:
 1. Clone or download the repository:
    ```bash
-   git clone https://github.com/souradeepsaha007/AI-resume-.git
-   cd AI-resume-
+   git clone https://github.com/souradeepsaha007/ResuMind.git
+   cd ResuMind
    ```
 2. Double-click **`run.bat`** (or run `.\run.bat` in Command Prompt / PowerShell).
    - It will automatically create a virtual environment, install the dependencies, and launch the app in your browser at `http://localhost:8501`.
@@ -51,8 +51,8 @@ Deploy to **Streamlit Community Cloud** so anyone can use it from any laptop, ph
 #### On macOS / Linux:
 1. Clone or download the repository:
    ```bash
-   git clone https://github.com/souradeepsaha007/AI-resume-.git
-   cd AI-resume-
+   git clone https://github.com/souradeepsaha007/ResuMind.git
+   cd ResuMind
    ```
 2. Make `start.sh` executable and run it:
    ```bash
@@ -66,8 +66,8 @@ Deploy to **Streamlit Community Cloud** so anyone can use it from any laptop, ph
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/souradeepsaha007/AI-resume-.git
-cd AI-resume-
+git clone https://github.com/souradeepsaha007/ResuMind.git
+cd ResuMind
 
 # 2. Create virtual environment
 python -m venv venv
