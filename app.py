@@ -36,17 +36,19 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg: #F3F0E8;
-    --ink: #151515;
+    --bg: #F8FAFC;
+    --ink: #0F172A;
     --blue: #4263EB;
-    --muted: #777777;
-    --navy: #071522;
+    --blue-dark: #364FC7;
+    --muted: #64748B;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
 }
 
 html, body, .stApp {
     background-color: var(--bg) !important;
     color: var(--ink) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
 }
 
 .block-container {
@@ -56,7 +58,7 @@ html, body, .stApp {
 }
 
 header[data-testid="stHeader"] {
-    background: transparent;
+    background: transparent !important;
 }
 
 #MainMenu, footer {
@@ -68,23 +70,24 @@ header[data-testid="stHeader"] {
     font-size: 21px;
     font-weight: 700;
     letter-spacing: .15em;
+    color: var(--ink) !important;
 }
 
 .brand span {
-    color: var(--blue);
+    color: var(--blue) !important;
 }
 
 .hero {
     text-align: center;
-    padding: 55px 10px 30px;
+    padding: 40px 10px 25px;
 }
 
 .hero-tag {
     display: inline-block;
-    background: white;
-    border: 1px solid #dce2fa;
+    background: #EEF2FF;
+    border: 1px solid #C7D2FE;
     border-radius: 30px;
-    padding: 8px 18px;
+    padding: 6px 16px;
     color: var(--blue);
     font-size: 11px;
     font-weight: 700;
@@ -93,28 +96,31 @@ header[data-testid="stHeader"] {
 
 .hero h1 {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: clamp(42px, 7vw, 72px);
-    line-height: 1.1;
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1.15;
     font-weight: 400;
-    margin: 25px 0 15px;
+    color: var(--ink) !important;
+    margin: 20px 0 12px;
 }
 
 .hero h1 em {
-    color: var(--blue);
+    color: var(--blue) !important;
+    font-style: italic;
 }
 
 .hero p {
-    max-width: 690px;
+    max-width: 680px;
     margin: auto;
-    color: #666;
-    font-size: 16px;
-    line-height: 1.8;
+    color: #475569 !important;
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 .section-heading {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 37px;
-    margin: 30px 0 12px;
+    font-size: 34px;
+    color: var(--ink) !important;
+    margin: 28px 0 10px;
 }
 
 .section-tag {
@@ -124,86 +130,356 @@ header[data-testid="stHeader"] {
     letter-spacing: .15em;
 }
 
+/* Upload Panel Header Styles */
+.upload-panel-header {
+    margin-bottom: 12px;
+}
+
+.panel-badge {
+    display: inline-block;
+    background: #EEF2FF;
+    color: var(--blue);
+    border: 1px solid #C7D2FE;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    margin-bottom: 6px;
+}
+
+.upload-panel-header h4 {
+    margin: 4px 0 2px 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #0F172A !important;
+}
+
+.panel-desc {
+    font-size: 13px;
+    color: #64748B !important;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+/* File Uploader - Pure Crisp Light Mode */
+div[data-testid="stFileUploader"] {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 16px !important;
+    padding: 18px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+div[data-testid="stFileUploader"] label[data-testid="stWidgetLabel"] {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+    background: #F8FAFC !important;
+    border: 2px dashed #93C5FD !important;
+    border-radius: 12px !important;
+    padding: 24px 14px !important;
+    text-align: center !important;
+}
+
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
+    background: #EFF6FF !important;
+    border-color: #3B82F6 !important;
+}
+
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {
+    fill: #4263EB !important;
+    stroke: #4263EB !important;
+    color: #4263EB !important;
+}
+
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] small,
+div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] div,
+div[data-testid="stFileUploaderDropzoneInstructions"] * {
+    color: #334155 !important;
+    font-weight: 500 !important;
+}
+
+div[data-testid="stFileUploader"] button,
+div[data-testid="stFileUploaderDropzone"] button,
+section[data-testid="stFileUploaderDropzone"] button {
+    background: #FFFFFF !important;
+    color: #2563EB !important;
+    -webkit-text-fill-color: #2563EB !important;
+    border: 1px solid #BFDBFE !important;
+    border-radius: 8px !important;
+    padding: 6px 16px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+div[data-testid="stFileUploader"] button:hover,
+div[data-testid="stFileUploaderDropzone"] button:hover,
+section[data-testid="stFileUploaderDropzone"] button:hover {
+    background: #EFF6FF !important;
+    color: #1D4ED8 !important;
+    -webkit-text-fill-color: #1D4ED8 !important;
+    border-color: #60A5FA !important;
+}
+
+div[data-testid="stFileUploaderFileData"] {
+    background: #F1F5F9 !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    margin-top: 10px !important;
+}
+
+div[data-testid="stFileUploaderFileData"] * {
+    color: #0F172A !important;
+}
+
+div[data-testid="stFileUploaderFileData"] button {
+    background: transparent !important;
+    border: none !important;
+    color: #64748B !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stFileUploaderFileData"] button:hover {
+    background: #FEE2E2 !important;
+    color: #DC2626 !important;
+}
+
+/* Textarea - Crisp White Background, High Contrast Text */
+div[data-testid="stTextArea"] {
+    background: transparent !important;
+}
+
+div[data-testid="stTextArea"] label[data-testid="stWidgetLabel"] {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+}
+
+div[data-baseweb="textarea"],
+div[data-baseweb="base-input"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+div[data-baseweb="textarea"]:focus-within,
+div[data-baseweb="base-input"]:focus-within {
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+div[data-baseweb="textarea"] textarea,
+div[data-baseweb="base-input"] textarea {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    padding: 14px !important;
+}
+
+div[data-baseweb="textarea"] textarea::placeholder,
+div[data-baseweb="base-input"] textarea::placeholder {
+    color: #94A3B8 !important;
+    -webkit-text-fill-color: #94A3B8 !important;
+}
+
+/* Primary and Secondary Buttons */
+button[kind="primary"],
+.stButton > button[kind="primary"],
+button[data-testid="stBaseButton-primary"],
+.stButton > button[data-testid="stBaseButton-primary"] {
+    background: linear-gradient(135deg, #4263EB 0%, #364FC7 100%) !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 999px !important;
+    min-height: 48px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: .05em !important;
+    box-shadow: 0 4px 14px rgba(66, 99, 235, 0.25) !important;
+    transition: all 0.2s ease !important;
+}
+
+button[kind="primary"]:hover,
+.stButton > button[kind="primary"]:hover,
+button[data-testid="stBaseButton-primary"]:hover,
+.stButton > button[data-testid="stBaseButton-primary"]:hover {
+    background: linear-gradient(135deg, #364FC7 0%, #2B3FA0 100%) !important;
+    box-shadow: 0 6px 20px rgba(66, 99, 235, 0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+button[kind="secondary"],
+.stButton > button,
+button[data-testid="stBaseButton-secondary"],
+.stButton > button[data-testid="stBaseButton-secondary"] {
+    background: #FFFFFF !important;
+    color: #1E293B !important;
+    -webkit-text-fill-color: #1E293B !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 999px !important;
+    min-height: 44px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: .03em !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.2s ease !important;
+}
+
+button[kind="secondary"]:hover,
+.stButton > button:hover,
+button[data-testid="stBaseButton-secondary"]:hover,
+.stButton > button[data-testid="stBaseButton-secondary"]:hover {
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
+    border-color: #94A3B8 !important;
+}
+
+.stDownloadButton > button,
+.stDownloadButton > button[data-testid="stBaseButton-primary"],
+.stDownloadButton > button[data-testid="stBaseButton-secondary"] {
+    background: linear-gradient(135deg, #4263EB 0%, #364FC7 100%) !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    border-radius: 999px !important;
+    border: none !important;
+    min-height: 48px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: .05em !important;
+    box-shadow: 0 4px 14px rgba(66, 99, 235, 0.25) !important;
+}
+
+.stDownloadButton > button:hover {
+    background: linear-gradient(135deg, #364FC7 0%, #2B3FA0 100%) !important;
+    box-shadow: 0 6px 20px rgba(66, 99, 235, 0.35) !important;
+}
+
+/* Code and Pre blocks */
+code, pre {
+    background: #F1F5F9 !important;
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+}
+
+/* Feature and Result Cards */
 .feature-card {
-    background: white;
-    border: 1px solid rgba(21,21,21,.08);
-    border-radius: 22px;
-    padding: 25px;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
     min-height: 180px;
     margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
 }
 
 .feature-card h3 {
     font-size: 17px;
+    color: #0F172A !important;
     margin-bottom: 10px;
 }
 
 .feature-card p {
     font-size: 13px;
-    color: #777;
+    color: #64748B !important;
     line-height: 1.7;
 }
 
-.stButton > button {
-    background: #151515 !important;
-    color: white !important;
-    border: 1px solid #151515 !important;
-    border-radius: 999px !important;
-    min-height: 46px;
-    font-weight: 600;
-    letter-spacing: .04em;
-}
-
-.stButton > button:hover {
-    background: var(--blue) !important;
-    border-color: var(--blue) !important;
-}
-
-.stDownloadButton > button {
-    background: var(--blue) !important;
-    color: white !important;
-    border-radius: 999px !important;
-    border: none !important;
-}
-
-div[data-testid="stFileUploader"] {
-    background: white;
-    border: 2px dashed #c8d1f5;
-    border-radius: 20px;
-    padding: 20px;
-}
-
+/* Metrics Cards */
 div[data-testid="stMetric"] {
-    background: white;
-    border: 1px solid rgba(21,21,21,.08);
-    border-radius: 18px;
-    padding: 20px;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 18px !important;
+    padding: 20px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+div[data-testid="stMetricLabel"] {
+    color: #64748B !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: .08em !important;
+    text-transform: uppercase !important;
 }
 
 div[data-testid="stMetricValue"] {
-    font-family: 'Instrument Serif', Georgia, serif;
+    color: #0F172A !important;
+    font-family: 'Instrument Serif', Georgia, serif !important;
+    font-size: 32px !important;
 }
 
-div[data-baseweb="textarea"] {
-    background: white;
-    border-radius: 16px;
+/* Alerts - Pure Light Mode, Zero Dark Spots */
+div[data-testid="stAlert"] {
+    border-radius: 14px !important;
+    padding: 14px 18px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
 }
 
-.result-card {
-    background: white;
-    border: 1px solid rgba(21,21,21,.08);
-    border-radius: 22px;
-    padding: 25px;
-    margin: 15px 0;
+div[data-testid="stAlert"] * {
+    color: inherit !important;
 }
 
+div[data-testid="stAlert"]:has([data-testid="stNotificationContentInfo"]) {
+    background: #EFF6FF !important;
+    color: #1E40AF !important;
+    border: 1px solid #BFDBFE !important;
+}
+
+div[data-testid="stAlert"]:has([data-testid="stNotificationContentSuccess"]) {
+    background: #F0FDF4 !important;
+    color: #166534 !important;
+    border: 1px solid #BBF7D0 !important;
+}
+
+div[data-testid="stAlert"]:has([data-testid="stNotificationContentWarning"]) {
+    background: #FFFBEB !important;
+    color: #92400E !important;
+    border: 1px solid #FDE68A !important;
+}
+
+div[data-testid="stAlert"]:has([data-testid="stNotificationContentError"]) {
+    background: #FEF2F2 !important;
+    color: #991B1B !important;
+    border: 1px solid #FECACA !important;
+}
+
+/* Expanders */
+div[data-testid="stExpander"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02) !important;
+}
+
+div[data-testid="stExpander"] details {
+    background: #FFFFFF !important;
+    border-radius: 14px !important;
+}
+
+div[data-testid="stExpander"] summary {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+}
+
+/* Skill Tags */
 .skill-tag {
     display: inline-block;
-    background: #edf0ff;
-    color: #344fc5;
-    border: 1px solid #d9e0ff;
+    background: #EEF2FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
     border-radius: 30px;
-    padding: 6px 13px;
+    padding: 6px 14px;
     margin: 4px;
     font-size: 12px;
     font-weight: 600;
@@ -211,22 +487,22 @@ div[data-baseweb="textarea"] {
 
 .missing-tag {
     display: inline-block;
-    background: #fff1e5;
-    color: #995000;
-    border: 1px solid #ffe0bd;
+    background: #FFF7ED;
+    color: #9A3412;
+    border: 1px solid #FED7AA;
     border-radius: 30px;
-    padding: 6px 13px;
+    padding: 6px 14px;
     margin: 4px;
     font-size: 12px;
     font-weight: 600;
 }
 
 .footer {
-    border-top: 1px solid rgba(21,21,21,.1);
+    border-top: 1px solid #E2E8F0;
     text-align: center;
     padding: 35px 0 10px;
     margin-top: 60px;
-    color: #777;
+    color: #64748B;
     font-size: 12px;
 }
 </style>
@@ -753,32 +1029,54 @@ if st.session_state.page == "Analysis":
         unsafe_allow_html=True
     )
 
-    input1, input2 = st.columns([1, 1])
+    input1, input2 = st.columns([1, 1], gap="medium")
 
     with input1:
+
+        st.markdown(
+            '<div class="upload-panel-header">'
+            '<span class="panel-badge">STEP 1</span>'
+            '<h4>Upload PDF Resume</h4>'
+            '<p class="panel-desc">Select or drop your text-based PDF resume (supports IT & non-IT).</p>'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
         uploaded_file = st.file_uploader(
             "Upload Resume PDF",
             type=["pdf"],
-            help="Upload a text-based PDF resume."
+            help="Upload a text-based PDF resume.",
+            label_visibility="collapsed"
         )
 
         if uploaded_file:
 
             st.success(
-                f"Resume loaded: {uploaded_file.name}"
+                f"✓ Resume loaded: {uploaded_file.name} ({len(uploaded_file.getvalue()) / 1024:.1f} KB)"
             )
 
     with input2:
+
+        st.markdown(
+            '<div class="upload-panel-header">'
+            '<span class="panel-badge">STEP 2</span>'
+            '<h4>Target Job Description <span style="font-weight:400; color:#64748B; font-size:12px;">(Optional)</span></h4>'
+            '<p class="panel-desc">Paste job requirements to run ATS skill matching and gap analysis.</p>'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
         job_description = st.text_area(
             "Target Job Description (Optional)",
             placeholder=(
                 "Paste the job description here if you "
-                "want a resume-to-job comparison..."
+                "want a resume-to-job comparison, ATS score & keyword match..."
             ),
-            height=180
+            height=180,
+            label_visibility="collapsed"
         )
+
+    st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
 
     analyse_button = st.button(
         "ANALYSE RESUME →",
@@ -1068,15 +1366,15 @@ if (
                 name="Missing",
                 x=["Job Skills"],
                 y=[len(match["missing_skills"])],
-                marker_color="#151515"
+                marker_color="#F43F5E"
             )
         )
 
         chart.update_layout(
             barmode="group",
-            paper_bgcolor="#F3F0E8",
-            plot_bgcolor="#FFFFFF",
-            font=dict(color="#151515"),
+            paper_bgcolor="#FFFFFF",
+            plot_bgcolor="#F8FAFC",
+            font=dict(color="#0F172A", family="Plus Jakarta Sans"),
             height=330,
             yaxis_title="Number of skills",
             margin=dict(l=25, r=25, t=30, b=30)
@@ -1110,9 +1408,9 @@ if (
             )
 
             chart.update_layout(
-                paper_bgcolor="#F3F0E8",
-                plot_bgcolor="#FFFFFF",
-                font=dict(color="#151515"),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
+                font=dict(color="#0F172A", family="Plus Jakarta Sans"),
                 height=300,
                 yaxis_title="Skills Count",
                 margin=dict(l=25, r=25, t=30, b=30)
@@ -1372,16 +1670,18 @@ if (
 
     if st.button(
         "START NEW RESUME ANALYSIS",
+        type="secondary",
         use_container_width=True
     ):
 
         st.session_state.analysis_result = None
         st.rerun()
 
-    st.markdown("""
-    <div class="footer">
-        <div class="brand">RESUMIND <span>AI</span></div>
-        Powered by Resumind AI<br>
-        &copy; 2026 Resumind AI
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="footer">'
+        '<div class="brand">RESUMIND <span>AI</span></div>'
+        'Powered by Resumind AI<br>'
+        '&copy; 2026 Resumind AI'
+        '</div>',
+        unsafe_allow_html=True
+    )
