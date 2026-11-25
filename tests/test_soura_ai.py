@@ -8,26 +8,31 @@ import json
 from pathlib import Path
 from llm_analyzer import analyze_resume
 
-if len(sys.argv) > 1:
-    pdf_path = sys.argv[1].strip().strip('"')
-elif sys.stdin.isatty():
-    pdf_path = input("Enter your resume PDF path: ").strip().strip('"')
-else:
-    pdf_path = "sample_resume.pdf"
+def run_test():
+    if len(sys.argv) > 1:
+        pdf_path = sys.argv[1].strip().strip('"')
+    elif sys.stdin.isatty():
+        pdf_path = input("Enter your resume PDF path: ").strip().strip('"')
+    else:
+        pdf_path = "sample_resume.pdf"
 
-if not pdf_path or not Path(pdf_path).exists():
-    print(f"Notice: No valid PDF file provided at '{pdf_path}'.")
-    print("Usage: python test_soura_ai.py <path_to_resume.pdf>")
-    sys.exit(0)
+    if not pdf_path or not Path(pdf_path).exists():
+        print(f"Notice: No valid PDF file provided at '{pdf_path}'.")
+        print("Usage: python test_soura_ai.py <path_to_resume.pdf>")
+        return
 
-try:
-    result = analyze_resume(pdf_path)
+    try:
+        result = analyze_resume(pdf_path)
 
-    print("\n===== RESUMIND AI =====")
-    print(json.dumps(result, indent=4, ensure_ascii=False))
+        print("\n===== RESUMIND AI =====")
+        print(json.dumps(result, indent=4, ensure_ascii=False))
 
-    print("\nAnalysis completed successfully!")
+        print("\nAnalysis completed successfully!")
 
-except Exception as error:
-    print("Error during resume analysis:", error)
+    except Exception as error:
+        print("Error during resume analysis:", error)
+
+
+if __name__ == "__main__":
+    run_test()
 
