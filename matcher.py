@@ -1,17 +1,14 @@
 
 import re
 import json
-import ollama
+import sys
+from pathlib import Path
 from collections import Counter
-from config import OLLAMA_HOST, MODEL_NAME as AI_MODEL
 
-
-# ============================================================
-# 1. CONFIGURATION
-# ============================================================
-
-def get_ollama_client():
-    return ollama.Client(host=OLLAMA_HOST, timeout=4.0)
+# Ensure root in sys.path
+_ROOT = Path(__file__).resolve().parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 
 # ============================================================
@@ -685,205 +682,97 @@ def analyse_resume_quality(text):
 
 
 # ============================================================
-# 11. GEMMA AI SKILL EXTRACTION
+# 11. NEURAL & TAXONOMY SKILL EXTRACTION (CUSTOM PYTORCH)
 # ============================================================
 
-def extract_skills_with_gemma(resume_text, job_description):
-
-    prompt = f"""
-You are an expert resume and job requirement extraction system.
-
-Analyse both texts carefully.
-
-RESUME:
-{resume_text[:12000]}
-
-JOB DESCRIPTION:
-{job_description[:10000]}
-
-Identify explicitly supported skills and competencies.
-
-Consider all career fields:
-
-- IT and software development
-- Engineering and manufacturing
-- Healthcare
-- Teaching and education
-- Finance and accounting
-- HR and recruitment
-- Marketing and sales
-- Business administration
-- Graphic design
-- Customer service
-- Hospitality
-- Operations and logistics
-- Research
-- Legal and administration
-
-Include:
-- Technical skills
-- Software and tools
-- Industry-specific skills
-- Professional competencies
-- Soft skills
-
-Rules:
-- Do not invent skills.
-- Do not assume qualifications prove a skill.
-- Keep resume skills and job requirements separate.
-- Avoid duplicates.
-- Do not include generic words.
-
-Return ONLY valid JSON:
-
-{{
-    "resume_skills": [],
-    "job_skills": []
-}}
-"""
+def extract_skills_with_neural_model(resume_text, job_description):
+    """
+    Extract skills from resume and job description using the trained PyTorch SkillNet
+    combined with domain taxonomy parsing (zero dependency on Ollama/Gemma).
+    """
+    resume_skills = []
+    job_skills = []
 
     try:
+        from ai_engine.inference import predict_skills
+        # Neural network predictions for resume
+        preds = predict_skills(resume_text)
+        resume_skills = [p["skill"] for p in preds if p.get("predicted_present")]
 
-        response = get_ollama_client().chat(
-            model=AI_MODEL,
-            format="json",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            options={
-                "temperature": 0
-            }
-        )
+        # Neural network predictions for job description
+        jd_preds = predict_skills(job_description)
+        job_skills = [p["skill"] for p in jd_preds if p.get("predicted_present")]
+    except Exception:
+        pass
 
-        result = json.loads(
-            response["message"]["content"]
-        )
+    # Augment with rule-based taxonomy extraction
+    rule_resume = extract_skills(resume_text)
+    rule_job = extract_skills(job_description)
 
-        resume_skills = result.get("resume_skills", [])
-        job_skills = result.get("job_skills", [])
+    combined_resume = list(dict.fromkeys(resume_skills + rule_resume))
+    combined_job = list(dict.fromkeys(job_skills + rule_job))
 
-        if not isinstance(resume_skills, list):
-            resume_skills = []
+    return combined_resume, combined_job
 
-        if not isinstance(job_skills, list):
-            job_skills = []
 
-        resume_skills = [
-            str(skill).strip()
-            for skill in resume_skills
-            if isinstance(skill, str) and skill.strip()
-        ]
-
-        job_skills = [
-            str(skill).strip()
-            for skill in job_skills
-            if isinstance(skill, str) and skill.strip()
-        ]
-
-        return resume_skills, job_skills
-
-    except Exception as error:
-
-        print("Gemma skill extraction error:", error)
-
-        return [], []
+# Backward-compatible alias
+extract_skills_with_gemma = extract_skills_with_neural_model
 
 
 # ============================================================
-# 12. GEMMA AI RESUME DETAIL EXTRACTION
+# 12. LOCAL RESUME DETAIL EXTRACTION (CUSTOM NLP ENGINE)
 # ============================================================
 
-def extract_resume_details_with_gemma(resume_text):
-
-    prompt = f"""
-You are an expert resume information extraction assistant.
-
-Extract information only when supported by the resume.
-
-RESUME:
-{resume_text[:12000]}
-
-Return valid JSON using this structure:
-
-{{
-    "candidate_name": "",
-    "email": "",
-    "phone": "",
-    "education": [],
-    "experience": [],
-    "projects": [],
-    "certifications": [],
-    "technical_skills": [],
-    "soft_skills": []
-}}
-
-Rules:
-
-- Do not invent information.
-- Preserve dates when available.
-- Include internships and volunteer experience.
-- Include academic and personal projects.
-- Include certification names and issuing organisations.
-- Do not confuse education with work experience.
-- Return empty lists when information is unavailable.
-- Return JSON only.
-"""
-
+def extract_resume_details_with_neural_engine(resume_text):
+    """
+    Extract structured candidate details using local field extraction
+    without calling external LLM APIs.
+    """
     try:
-
-        response = get_ollama_client().chat(
-            model=AI_MODEL,
-            format="json",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            options={
-                "temperature": 0
-            }
+        from ai_engine.field_extractor import (
+            extract_education,
+            extract_years,
+            extract_projects,
+            extract_certifications
         )
+        from ai_engine.resume_observer import extract_contact_info, extract_name
 
-        details = json.loads(
-            response["message"]["content"]
-        )
+        contact = extract_contact_info(resume_text)
+        cand_name = extract_name(resume_text)
+        edu = extract_education(resume_text)
+        exp_years = extract_years(resume_text)
+        projs = extract_projects(resume_text)
+        certs = extract_certifications(resume_text)
+        tech_skills = extract_skills(resume_text)
 
-        list_fields = [
-            "education",
-            "experience",
-            "projects",
-            "certifications",
-            "technical_skills",
-            "soft_skills"
-        ]
-
-        for field in list_fields:
-
-            if not isinstance(details.get(field), list):
-
-                details[field] = []
-
-        return details
-
-    except Exception as error:
-
-        print("Gemma resume extraction error:", error)
-
+        return {
+            "candidate_name": cand_name or contact.get("name", ""),
+            "email": contact.get("email", ""),
+            "phone": contact.get("phone", ""),
+            "education": edu if isinstance(edu, list) else [str(edu)],
+            "experience": [f"{exp_years} years experience"] if exp_years else [],
+            "projects": projs if isinstance(projs, list) else [str(projs)],
+            "certifications": certs if isinstance(certs, list) else [str(certs)],
+            "technical_skills": tech_skills,
+            "soft_skills": []
+        }
+    except Exception:
+        sections = extract_sections(resume_text)
         return {
             "candidate_name": "",
             "email": "",
             "phone": "",
-            "education": [],
-            "experience": [],
-            "projects": [],
-            "certifications": [],
-            "technical_skills": [],
+            "education": [s.strip() for s in sections.get("Education", "").splitlines() if s.strip()][:5],
+            "experience": [s.strip() for s in sections.get("Experience", "").splitlines() if s.strip()][:5],
+            "projects": [s.strip() for s in sections.get("Projects", "").splitlines() if s.strip()][:5],
+            "certifications": [s.strip() for s in sections.get("Certifications", "").splitlines() if s.strip()][:5],
+            "technical_skills": extract_skills(resume_text),
             "soft_skills": []
         }
+
+
+# Backward-compatible alias
+extract_resume_details_with_gemma = extract_resume_details_with_neural_engine
 
 
 # ============================================================

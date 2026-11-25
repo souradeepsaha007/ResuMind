@@ -17,12 +17,12 @@ if str(BASE_DIR) not in sys.path:
 try:
     from matcher import calculate_match
     from llm_analyzer import analyse_resume
-    from config import OLLAMA_HOST, MODEL_NAME
+    from config import DEVICE, APP_NAME
 except ImportError:
     # If run from root
     from matcher import calculate_match  # type: ignore
     from llm_analyzer import analyse_resume  # type: ignore
-    from config import OLLAMA_HOST, MODEL_NAME  # type: ignore
+    from config import DEVICE, APP_NAME  # type: ignore
 
 app = FastAPI(
     title="Resumind AI",
@@ -971,9 +971,8 @@ def health_check():
     return {
         "status": "healthy",
         "service": "Resumind AI",
-        "version": "1.0.0",
-        "ollama_host": OLLAMA_HOST,
-        "model": MODEL_NAME
+        "version": "2.0.0",
+        "engine": "Custom PyTorch Neural Architecture (SkillNet & MatchNet)"
     }
 
 

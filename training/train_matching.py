@@ -1,29 +1,24 @@
 import sys
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-
 import json
-import joblib
+from pathlib import Path
 import numpy as np
 import pandas as pd
+import joblib
 import torch
 import torch.nn as nn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 
+BASE_DIR = Path(__file__).resolve().parents[1]
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 from ai_engine.matching_model import ResumindMatchNet
 
-
-# -----------------------------
-# 1. Configuration
-# -----------------------------
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_PATH = BASE_DIR / "training" / "datasets" / "job_description.csv"
+DATA_PATH = BASE_DIR / "dataset" / "job_description.csv"
+if not DATA_PATH.exists():
+    DATA_PATH = BASE_DIR / "training" / "datasets" / "job_description.csv"
 MODEL_DIR = BASE_DIR / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 

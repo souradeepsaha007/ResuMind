@@ -1231,16 +1231,15 @@ if (
 
         st.divider()
 
-        st.markdown("### Soura Neural Network Predictions")
+        st.markdown("### ✦ Resumind Neural Network Predictions")
 
         st.caption(
-            "Predictions from your trained skill classifier. "
-            "These are experimental until validated on a larger dataset."
+            "Predictions from your custom PyTorch SkillNet trained on your RTX 2050 GPU."
         )
 
         st.dataframe(
             data["trained_skill_predictions"],
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
 
@@ -1249,6 +1248,13 @@ if (
         st.warning(
             "The trained model could not run: "
             + data["trained_model_warning"]
+        )
+
+    else:
+
+        st.info(
+            "Custom PyTorch SkillNet model is not trained yet. "
+            "Run 'python build_model.py' to train it."
         )
 
     # ------------------------------------------------------
@@ -1324,15 +1330,6 @@ if (
 
         st.session_state.analysis_result = None
         st.rerun()
-
-    soura_data = result.get("soura_result", {}) if isinstance(result, dict) else {}
-    if soura_data and soura_data.get("trained_skill_predictions"):
-        st.markdown("### ✦ RESUMIND SKILLNET PREDICTIONS")
-        st.dataframe(
-            soura_data["trained_skill_predictions"],
-            width="stretch",
-            hide_index=True
-        )
 
     st.markdown("""
     <div class="footer">

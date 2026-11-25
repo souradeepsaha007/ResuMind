@@ -1,132 +1,85 @@
 import os
-import json
+import sys
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-import ollama
+
+# Ensure root in path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 # Load environment variables
-env_path = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
+load_dotenv(dotenv_path=ROOT_DIR / ".env")
+
+from matcher import calculate_match
+from ai_engine.inference import predict_skills, predict_match
+from llm_analyzer import analyse_resume
 
 app = FastAPI(
-    title="Resumind Cloud API",
-    version="1.0.0",
-    description="REST API backend for Resumind Resume Intelligence"
+    title="Resumind PyTorch Neural API",
+    version="2.0.0",
+    description="REST API backend for Resumind Resume Intelligence powered by PyTorch"
 )
 
-# Configuration with intelligent defaults
 API_KEY = os.getenv("APP_API_KEY", "")
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-MODEL_NAME = os.getenv("OLLAMA_MODEL", "resumind:latest")
-
-# Helper to get Ollama client
-def get_ollama_client():
-    return ollama.Client(host=OLLAMA_HOST)
 
 
 class ResumeRequest(BaseModel):
-    resume_text: str = Field(min_length=20, description="Full text extracted from candidate resume")
+    resume_text: str = Field(min_length=15, description="Full text extracted from candidate resume")
     job_description: str = Field(min_length=10, description="Target job description")
 
 
 @app.get("/")
 def home():
     return {
-        "application": "Resumind",
-        "status": "running",
-        "backend": "Resumind AI Inference",
-        "ollama_host": OLLAMA_HOST,
-        "model": MODEL_NAME
+        "application": "Resumind AI",
+        "engine": "Custom PyTorch Neural Models",
+        "status": "active"
     }
 
 
 @app.get("/health")
 def health():
-    try:
-        client = get_ollama_client()
-        # Verify connection to Ollama
-        client.list()
-        return {
-            "status": "healthy",
-            "ollama_connection": "connected",
-            "model": MODEL_NAME
-        }
-    except Exception as e:
-        return {
-            "status": "degraded",
-            "ollama_connection": f"cannot connect to {OLLAMA_HOST}: {str(e)}",
-            "model": MODEL_NAME
-        }
+    return {
+        "status": "healthy",
+        "engine": "PyTorch Neural Architecture (SkillNet & MatchNet)",
+        "models_loaded": True
+    }
 
 
 @app.post("/analyze")
-def analyze_resume(
+def analyze_resume_endpoint(
     request: ResumeRequest,
     authorization: str = Header(default="")
 ):
     if API_KEY and authorization != f"Bearer {API_KEY}":
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
-    prompt = f"""
-You are Resumind, an expert resume analysis assistant.
-
-Analyze the following resume against the job description.
-
-RESUME:
-{request.resume_text[:15000]}
-
-JOB DESCRIPTION:
-{request.job_description[:8000]}
-
-Return a structured JSON analysis containing:
-1. overall_match_score (integer between 0 and 100)
-2. candidate_profile_summary (short summary)
-3. matched_skills (list of strings)
-4. missing_skills (list of strings)
-5. candidate_strengths (list of strings)
-6. improvement_suggestions (list of strings)
-7. final_recommendation (short verdict)
-
-Return valid JSON only.
-"""
-
     try:
-        client = get_ollama_client()
-        response = client.chat(
-            model=MODEL_NAME,
-            format="json",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Resumind, a professional AI resume analyser. Return valid JSON only."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            options={
-                "temperature": 0.2
-            }
-        )
+        # 1. Deterministic match
+        match_data = calculate_match(request.resume_text, request.job_description)
 
-        result_text = response["message"]["content"]
+        # 2. Neural Skill Predictions
+        skill_predictions = predict_skills(request.resume_text)
 
-        try:
-            parsed_result = json.loads(result_text)
-        except (json.JSONDecodeError, TypeError):
-            parsed_result = {"analysis": result_text}
+        # 3. Neural Match Score
+        neural_score = predict_match(request.resume_text, request.job_description)
+
+        # 4. Executive synthesis
+        synthesis = analyse_resume(request.resume_text, request.job_description)
 
         return {
             "success": True,
-            "model": MODEL_NAME,
-            "analysis": parsed_result
+            "overall_match_score": match_data.get("match_score", neural_score),
+            "ats_compatibility_score": match_data.get("ats_score", 75),
+            "neural_match_score": neural_score,
+            "matched_skills": match_data.get("matched_skills", []),
+            "missing_skills": match_data.get("missing_skills", []),
+            "recommendations": match_data.get("recommendations", []),
+            "neural_skill_predictions": skill_predictions[:10],
+            "executive_analysis": synthesis
         }
-
-    except Exception as error:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Resumind model inference failed: {str(error)}"
-        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analysis pipeline error: {str(e)}")

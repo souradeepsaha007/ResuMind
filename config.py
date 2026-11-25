@@ -1,18 +1,14 @@
-
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
+import torch
 
-# Load environment variables from .env if present
+# Load environment variables
 load_dotenv()
 
 # Main project directory
 BASE_DIR = Path(__file__).resolve().parent
-
-# Ollama model configuration
-MODEL_NAME = os.getenv("OLLAMA_MODEL", "resumind:latest")
-BASE_MODEL = os.getenv("OLLAMA_BASE_MODEL", "gemma3:1b")
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 # Project folders
 MODEL_DIR = BASE_DIR / "models"
@@ -31,12 +27,21 @@ for folder in [
 ]:
     folder.mkdir(parents=True, exist_ok=True)
 
+# Custom PyTorch Model Paths
+SKILL_MODEL_PATH = MODEL_DIR / "soura_skill_model.pth"
+SKILL_VECTORIZER_PATH = MODEL_DIR / "soura_vectorizer.joblib"
+MATCH_MODEL_PATH = MODEL_DIR / "resumind_match_model.pth"
+MATCH_VECTORIZER_PATH = MODEL_DIR / "resumind_match_vectorizer.joblib"
+
+# Compute device
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 # PDF configuration
 ALLOWED_EXTENSIONS = ["pdf"]
 MAX_FILE_SIZE_MB = 10
 
 # Application configuration
-APP_NAME = "Resumind"
-APP_VERSION = "1.0.0"
+APP_NAME = "Resumind AI"
+APP_VERSION = "2.0.0"
 
-print("Resumind configuration loaded successfully!")
+print(f"Resumind AI configuration loaded successfully! (Device: {DEVICE})")

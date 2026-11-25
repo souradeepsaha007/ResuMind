@@ -26,3 +26,7 @@ outputs/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local safety backups
+_backup_pre_cleanup/
+

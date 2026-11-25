@@ -1,10 +1,11 @@
+torch
 streamlit
 pymupdf
-ollama
 reportlab
 numpy
 pandas
 scikit-learn
+joblib
 python-dotenv
 fastapi
 uvicorn

@@ -2,15 +2,22 @@ import os
 import random
 from pathlib import Path
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
-# Define target skills for our custom AI neural network
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DATASET_DIR = ROOT_DIR / "dataset"
+DATASET_DIR.mkdir(parents=True, exist_ok=True)
+
+# Also support legacy training/datasets location
+LEGACY_DIR = ROOT_DIR / "training" / "datasets"
+LEGACY_DIR.mkdir(parents=True, exist_ok=True)
+
 TARGET_SKILLS = [
     "Python", "Java", "C++", "JavaScript", "TypeScript",
     "React", "Node.js", "SQL", "Docker", "AWS",
     "Machine Learning", "Git", "HTML", "CSS", "Excel", "FastAPI"
 ]
 
-# Rich, realistic resume training samples across modern technology and business domains
 RESUME_SAMPLES = [
     # Full-Stack & Web
     ("Full-stack engineer with 4 years experience building web apps using React, TypeScript, Node.js, and PostgreSQL. Integrated REST APIs and automated Docker deployments.",
@@ -73,18 +80,15 @@ RESUME_SAMPLES = [
     ("Financial clerk reconciling invoices, bank transactions, and ledger entries using spreadsheets.", ["Excel"])
 ]
 
-# Generate augmentations to ensure a robust training set (>100 samples)
+
 def generate_resume_dataset():
     rows = []
-    
-    # 1. Base samples
     for text, skills in RESUME_SAMPLES:
         row = {"resume_text": text}
         for skill in TARGET_SKILLS:
             row[skill] = int(skill in skills)
         rows.append(row)
 
-    # 2. Synthetic variations combining random subsets
     templates = [
         "Proven background in {s1} and {s2}. Successfully delivered projects involving {s3} and {s4} using Git.",
         "Experienced professional skilled in {s1}, {s2}, and {s3}. Handled database queries in {s4} and deployed via {s5}.",
@@ -96,12 +100,10 @@ def generate_resume_dataset():
     tech_pool = ["Python", "Java", "JavaScript", "TypeScript", "React", "Node.js", "SQL", "Docker", "AWS", "FastAPI", "C++", "Machine Learning"]
 
     random.seed(42)
-    for _ in range(80):
+    for _ in range(90):
         picked = random.sample(tech_pool, k=random.randint(3, 5))
         template = random.choice(templates)
-        
         args = {f"s{i+1}": picked[i] for i in range(len(picked))}
-        # Fill any unused placeholders
         for i in range(len(picked), 5):
             args[f"s{i+1}"] = random.choice(tech_pool)
             
@@ -114,11 +116,9 @@ def generate_resume_dataset():
             row[skill] = int(skill in picked)
         rows.append(row)
 
-    df_resumes = pd.DataFrame(rows)
-    return df_resumes
+    return pd.DataFrame(rows)
 
 
-# Job Descriptions paired with candidate compatibility scores
 JOB_DESCRIPTION_SAMPLES = [
     {
         "job_title": "Full-Stack Python & React Developer",
@@ -172,9 +172,6 @@ JOB_DESCRIPTION_SAMPLES = [
 
 
 def generate_matching_dataset(df_resumes):
-    """
-    Generate paired (resume, job_description) records with ground-truth compatibility scores (0.0 to 100.0).
-    """
     pairs = []
     random.seed(101)
 
@@ -186,14 +183,12 @@ def generate_matching_dataset(df_resumes):
             jd_text = jd["job_description"]
             jd_skills = set(s.strip() for s in jd["required_skills"].split(","))
 
-            # Calculate mathematical skill overlap
             if jd_skills:
                 overlap = len(res_skills.intersection(jd_skills))
                 skill_score = (overlap / len(jd_skills)) * 80.0
             else:
                 skill_score = 50.0
 
-            # Baseline text relevancy
             noise = random.uniform(-3.0, 3.0)
             final_score = max(5.0, min(98.0, skill_score + 10.0 + noise))
 
@@ -206,28 +201,36 @@ def generate_matching_dataset(df_resumes):
                 "is_match": int(final_score >= 60.0)
             })
 
-    # Shuffle paired dataset
     random.shuffle(pairs)
     return pd.DataFrame(pairs)
 
 
 def main():
-    base_dir = Path(__file__).resolve().parent / "datasets"
-    base_dir.mkdir(parents=True, exist_ok=True)
-
     print("Generating comprehensive resume training dataset...")
     df_resumes = generate_resume_dataset()
-    resumes_path = base_dir / "resumes.csv"
-    df_resumes.to_csv(resumes_path, index=False, encoding="utf-8")
-    print(f" Saved {len(df_resumes)} resumes to: {resumes_path}")
 
-    print("Generating resume-job matching dataset...")
+    # Split into train and validation sets (80 / 20)
+    df_train, df_val = train_test_split(df_resumes, test_size=0.20, random_state=42)
+
+    # Save to dataset/
+    df_resumes.to_csv(DATASET_DIR / "resumes.csv", index=False, encoding="utf-8")
+    df_train.to_csv(DATASET_DIR / "skills_train.csv", index=False, encoding="utf-8")
+    df_val.to_csv(DATASET_DIR / "skills_validation.csv", index=False, encoding="utf-8")
+
+    # Mirror to legacy location
+    df_resumes.to_csv(LEGACY_DIR / "resumes.csv", index=False, encoding="utf-8")
+
+    print(f" Saved {len(df_resumes)} resumes to: {DATASET_DIR / 'resumes.csv'}")
+    print(f" Saved {len(df_train)} train resumes to: {DATASET_DIR / 'skills_train.csv'}")
+    print(f" Saved {len(df_val)} val resumes to: {DATASET_DIR / 'skills_validation.csv'}")
+
+    print("\nGenerating resume-job matching dataset...")
     df_matches = generate_matching_dataset(df_resumes)
-    jd_path = base_dir / "job_description.csv"
-    df_matches.to_csv(jd_path, index=False, encoding="utf-8")
-    print(f" Saved {len(df_matches)} paired match records to: {jd_path}")
+    df_matches.to_csv(DATASET_DIR / "job_description.csv", index=False, encoding="utf-8")
+    df_matches.to_csv(LEGACY_DIR / "job_description.csv", index=False, encoding="utf-8")
+    print(f" Saved {len(df_matches)} paired match records to: {DATASET_DIR / 'job_description.csv'}")
 
-    print("\nDataset generation completed successfully!")
+    print("\nDataset preparation completed successfully!")
 
 
 if __name__ == "__main__":

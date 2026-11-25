@@ -17,7 +17,9 @@ from sklearn.metrics import f1_score, classification_report
 # -----------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_PATH = BASE_DIR / "training" / "datasets" / "resumes.csv"
+DATA_PATH = BASE_DIR / "dataset" / "resumes.csv"
+if not DATA_PATH.exists():
+    DATA_PATH = BASE_DIR / "training" / "datasets" / "resumes.csv"
 MODEL_DIR = BASE_DIR / "models"
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
