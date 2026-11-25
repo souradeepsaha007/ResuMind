@@ -177,7 +177,7 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
     }
 
     result["job_description_provided"] = bool(job_description and job_description.strip())
-    if job_description:
-        result["ai_analysis"] = analyse_resume(resume_text, job_description)
+    # Always generate the full executive AI analysis report
+    result["ai_analysis"] = analyse_resume(resume_text, job_description or "")
 
     return result

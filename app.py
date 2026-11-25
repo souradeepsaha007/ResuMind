@@ -381,11 +381,16 @@ def extract_job_skills(job_description):
 
 def calculate_job_match(resume_result, job_description):
 
-    resume_skills = [
-        skill
-        for category_skills in resume_result["skills"].values()
-        for skill in category_skills
-    ]
+    resume_skills = []
+    for category_skills in resume_result.get("skills", {}).values():
+        for skill in category_skills:
+            if skill not in resume_skills:
+                resume_skills.append(skill)
+
+    # Merge verified skills from trained PyTorch SkillNet
+    for pred in resume_result.get("trained_skill_predictions", []):
+        if pred.get("predicted_present") and pred.get("skill") not in resume_skills:
+            resume_skills.append(pred["skill"])
 
     required_skills = extract_job_skills(job_description)
 
@@ -859,9 +864,12 @@ if st.session_state.page == "Analysis":
 
                         all_skills = [
                             skill
-                            for values in soura_result["skills"].values()
+                            for values in soura_result.get("skills", {}).values()
                             for skill in values
                         ]
+                        for pred in soura_result.get("trained_skill_predictions", []):
+                            if pred.get("predicted_present") and pred.get("skill") not in all_skills:
+                                all_skills.append(pred["skill"])
 
                         match_data = {
                             "resume_skills": all_skills,
@@ -1079,6 +1087,53 @@ if (
             use_container_width=True
         )
 
+    else:
+
+        cat_counts = {
+            cat: len(s_list)
+            for cat, s_list in data.get("skills", {}).items()
+            if s_list
+        }
+
+        if cat_counts:
+
+            st.markdown("### Profile Skill Domain Breakdown")
+
+            chart = go.Figure()
+
+            chart.add_trace(
+                go.Bar(
+                    x=list(cat_counts.keys()),
+                    y=list(cat_counts.values()),
+                    marker_color="#4263EB"
+                )
+            )
+
+            chart.update_layout(
+                paper_bgcolor="#F3F0E8",
+                plot_bgcolor="#FFFFFF",
+                font=dict(color="#151515"),
+                height=300,
+                yaxis_title="Skills Count",
+                margin=dict(l=25, r=25, t=30, b=30)
+            )
+
+            st.plotly_chart(
+                chart,
+                use_container_width=True
+            )
+
+        if match.get("resume_skills"):
+
+            st.markdown("### Profile Verified Skills")
+
+            tags = "".join(
+                f'<span class="skill-tag">✓ {escape(str(skill))}</span>'
+                for skill in match["resume_skills"]
+            )
+
+            st.markdown(tags, unsafe_allow_html=True)
+
     # ------------------------------------------------------
     # SKILLS BY CATEGORY
     # ------------------------------------------------------
@@ -1118,6 +1173,23 @@ if (
         )
 
     # ------------------------------------------------------
+    # COMPLETE RESUMIND AI ANALYSIS REPORT
+    # ------------------------------------------------------
+
+    ai_report = data.get("ai_analysis")
+    if ai_report:
+
+        st.divider()
+
+        st.markdown(
+            '<span class="section-tag">EXECUTIVE INTELLIGENCE</span>'
+            '<div class="section-heading">Complete Resumind AI Analysis</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown(ai_report)
+
+    # ------------------------------------------------------
     # PROFESSIONAL SUMMARY & OBJECTIVE
     # ------------------------------------------------------
 
@@ -1144,18 +1216,19 @@ if (
 
     st.markdown("### Education")
 
-    education = data["education"]
+    education = data.get("education") or {}
+    sec_text = education.get("section_text", "") if isinstance(education, dict) else str(education)
+    quals = education.get("possible_qualifications", []) if isinstance(education, dict) else []
 
     st.write(
-        education["section_text"]
-        or "No education section detected."
+        sec_text or "No education section detected."
     )
 
-    if education["possible_qualifications"]:
+    if quals:
 
         st.markdown("**Possible qualifications detected:**")
 
-        for qualification in education["possible_qualifications"]:
+        for qualification in quals:
             st.write(f"• {qualification}")
 
     # ------------------------------------------------------
@@ -1166,18 +1239,19 @@ if (
 
     st.markdown("### Work Experience")
 
-    experience = data["experience"]
+    experience = data.get("experience") or {}
+    exp_text = experience.get("section_text", "") if isinstance(experience, dict) else str(experience)
+    exp_years = experience.get("years_of_experience_mentioned") if isinstance(experience, dict) else None
 
     st.write(
-        experience["section_text"]
-        or "No experience section detected."
+        exp_text or "No experience section detected."
     )
 
-    if experience["years_of_experience_mentioned"] is not None:
+    if exp_years is not None:
 
         st.metric(
             "Experience mentioned",
-            f"{experience['years_of_experience_mentioned']} years"
+            f"{exp_years} years"
         )
 
     # ------------------------------------------------------
