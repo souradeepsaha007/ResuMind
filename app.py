@@ -989,7 +989,7 @@ if (
             )
 
         st.progress(
-            int(match["match_score"]),
+            min(100, max(0, int(round(float(match["match_score"]))))),
             text="Percentage of recognised job skills found in the resume"
         )
 

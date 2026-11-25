@@ -67,15 +67,23 @@ def analyse_resume(resume_text: str, job_description: Optional[str] = None) -> s
 
     matched_skills = match_data.get("matched_skills", [])
     missing_skills = match_data.get("missing_skills", [])
-    math_score = match_data.get("match_score", 70)
+    raw_math_score = match_data.get("match_score")
+    math_score = float(raw_math_score) if raw_math_score is not None else None
     ats_score = match_data.get("ats_score", 75)
+    if ats_score is None:
+        ats_score = 75
+
     recs = match_data.get("recommendations", [])
 
     # Blend deterministic score with neural match score if available
-    if neural_score is not None:
-        blended_score = round(0.6 * float(math_score) + 0.4 * float(neural_score), 1)
+    if neural_score is not None and math_score is not None:
+        blended_score = round(0.6 * math_score + 0.4 * float(neural_score), 1)
+    elif neural_score is not None:
+        blended_score = round(float(neural_score), 1)
+    elif math_score is not None:
+        blended_score = round(math_score, 1)
     else:
-        blended_score = round(float(math_score), 1) if math_score is not None else 70.0
+        blended_score = round(float(ats_score), 1)
 
     combined_skills = list(dict.fromkeys(matched_skills + detected_skills))
     skills_str = ", ".join(combined_skills[:10]) if combined_skills else "General technical & professional competencies"
