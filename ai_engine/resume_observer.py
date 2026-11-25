@@ -127,52 +127,66 @@ SECTION_ALIASES = {
     "professional_summary": [
         "professional summary", "summary", "profile",
         "career profile", "professional profile",
-        "about me", "executive summary"
+        "about me", "executive summary", "overview",
+        "career summary", "background summary", "bio"
     ],
 
     "objective": [
         "career objective", "objective",
-        "career goal", "professional objective"
+        "career goal", "professional objective", "job objective"
     ],
 
     "education": [
         "education", "academic background",
-        "educational qualifications", "academic qualifications"
+        "educational qualifications", "academic qualifications",
+        "academics", "education & credentials", "academic history",
+        "education & training", "academic details", "qualifications"
     ],
 
     "experience": [
         "work experience", "professional experience",
         "employment history", "career history",
-        "experience", "internship experience"
+        "experience", "internship experience", "internships",
+        "work history", "relevant experience", "practical experience"
     ],
 
     "skills": [
         "skills", "technical skills", "core competencies",
-        "key skills", "areas of expertise",
-        "professional skills", "competencies"
+        "key skills", "areas of expertise", "professional skills",
+        "competencies", "technologies", "tools & technologies",
+        "tech stack", "tools and technologies", "programming skills",
+        "technical expertise", "skills & tools"
     ],
 
     "projects": [
-        "projects", "academic projects",
-        "personal projects", "key projects"
+        "projects", "academic projects", "personal projects",
+        "key projects", "project work", "technical projects"
     ],
 
     "certifications": [
-        "certifications", "certificates",
-        "licenses", "training and certifications"
+        "certifications", "certificates", "licenses",
+        "training and certifications", "certifications & professional development",
+        "professional development", "courses & certifications",
+        "certifications & courses", "certifications and licenses",
+        "credentials", "trainings", "workshops & certifications"
     ],
 
     "achievements": [
-        "achievements", "awards", "honors",
-        "accomplishments"
+        "achievements", "awards", "honors", "accomplishments",
+        "key achievements", "awards & achievements", "honors & awards"
     ],
 
     "languages": [
-        "languages", "language proficiency"
+        "languages", "language proficiency", "languages known"
     ],
 
     "interests": [
-        "interests", "hobbies", "activities"
+        "interests", "hobbies", "activities", "extracurricular activities"
+    ],
+
+    "additional_information": [
+        "additional information", "other information", "miscellaneous",
+        "general information", "extra details"
     ],
 
     "references": [
@@ -199,14 +213,22 @@ def extract_pdf_text(file_path):
 
     with pymupdf.open(file_path) as document:
 
-        for page_number, page in enumerate(document, start=1):
+        for page in document:
 
-            page_text = page.get_text("text")
+            # Attempt sorted text extraction first for layout reading order
+            page_text = page.get_text("text", sort=True)
+
+            # Fall back to blocks if page_text is empty or unformatted
+            if not page_text or len(page_text.strip()) < 15:
+                blocks = page.get_text("blocks")
+                page_text = "\n".join(b[4] for b in blocks if len(b) > 4 and str(b[4]).strip())
 
             if page_text.strip():
                 text.append(page_text)
 
-    return "\n".join(text)
+    full_text = "\n".join(text)
+    full_text = full_text.replace("\xa0", " ")
+    return full_text
 
 
 # =====================================================
@@ -216,6 +238,7 @@ def extract_pdf_text(file_path):
 def clean_text(text):
 
     text = text.replace("\x00", " ")
+    text = text.replace("\xa0", " ")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
 
@@ -223,8 +246,32 @@ def clean_text(text):
 
 
 # =====================================================
-# CONTACT INFORMATION
+# CONTACT & PERSONAL INFORMATION
 # =====================================================
+
+def extract_name(text):
+    """Identify the candidate's name from the top header lines of the resume."""
+    excluded = [
+        "resume", "curriculum vitae", "cv", "portfolio", "contact",
+        "email", "phone", "mobile", "linkedin", "github", "profile",
+        "summary", "objective", "address", "education", "experience",
+        "skills", "page", "developer", "engineer"
+    ]
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    for line in lines[:10]:
+        clean_line = re.sub(r"^[•*|✦\s\d\.-]+", "", line).strip()
+        words = clean_line.split()
+        # Candidate names are typically 1 to 4 capitalized words without numbers or emails
+        if (
+            1 <= len(words) <= 4
+            and len(clean_line) <= 45
+            and not re.search(r"[@\d:/\\{}<>]", clean_line)
+            and not any(exc in clean_line.lower() for exc in excluded)
+            and any(c.isalpha() for c in clean_line)
+        ):
+            return clean_line
+    return "Candidate"
+
 
 def extract_email(text):
 
@@ -237,14 +284,27 @@ def extract_email(text):
 
 def extract_phone(text):
 
-    pattern = r"(?<!\w)(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,5}\)?[-.\s]?)?\d{6,10}(?!\w)"
+    # Match Indian 10-digit mobile (+91 / 9XXXXXXXXX), US, and international formats
+    pattern = r"(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,5}\)?[\s.-]?)?\d{3,5}[\s.-]?\d{4,5}"
 
     matches = re.findall(pattern, text)
+    cleaned = []
+    for match in matches:
+        digits = re.sub(r"\D", "", match)
+        if 10 <= len(digits) <= 13:
+            cleaned.append(match.strip())
 
-    return list(dict.fromkeys(
-        match.strip() for match in matches
-        if len(re.sub(r"\D", "", match)) >= 10
-    ))
+    return list(dict.fromkeys(cleaned))
+
+
+def extract_linkedin(text):
+    match = re.search(r"(?:https?://)?(?:www\.)?linkedin\.com/(?:in|pub)/[a-zA-Z0-9_\-]+", text, re.IGNORECASE)
+    return match.group(0) if match else ""
+
+
+def extract_github(text):
+    match = re.search(r"(?:https?://)?(?:www\.)?github\.com/[a-zA-Z0-9_\-]+", text, re.IGNORECASE)
+    return match.group(0) if match else ""
 
 
 def extract_links(text):
@@ -260,6 +320,33 @@ def extract_links(text):
 # SECTION DETECTION
 # =====================================================
 
+def is_section_header(line):
+    """Determines whether a line is a section boundary header."""
+    clean_line = re.sub(r"^[\s\d\.\-•✦*|#:]+\s*", "", line).strip()
+    clean_line = re.sub(r"[:\-|]+$", "", clean_line).strip()
+    if not clean_line or len(clean_line) > 55:
+        return None
+
+    norm = clean_line.lower()
+
+    # Direct match in aliases
+    for sec, aliases in SECTION_ALIASES.items():
+        if norm in aliases:
+            return sec
+
+    # Prefix or word-boundary match for compound headings
+    for sec, aliases in SECTION_ALIASES.items():
+        for alias in aliases:
+            if norm == alias:
+                return sec
+            if norm.startswith(alias + " ") or norm.endswith(" " + alias):
+                return sec
+            if len(alias) >= 6 and re.search(r'\b' + re.escape(alias) + r'\b', norm):
+                return sec
+
+    return None
+
+
 def identify_sections(text):
 
     sections = {
@@ -267,30 +354,49 @@ def identify_sections(text):
     }
 
     current_section = "other"
+    intro_lines = []
 
     for line in text.splitlines():
 
-        line = line.strip()
+        stripped = line.strip()
 
-        if not line:
+        if not stripped:
             continue
 
-        normalized = re.sub(r"[:\-]+$", "", line.lower()).strip()
-
         detected_section = None
+        colon_content = None
 
-        for section, aliases in SECTION_ALIASES.items():
+        if ":" in stripped:
+            parts = stripped.split(":", 1)
+            hdr = is_section_header(parts[0])
+            if hdr and parts[1].strip():
+                detected_section = hdr
+                colon_content = parts[1].strip()
 
-            if normalized in aliases:
-                detected_section = section
-                break
+        if not detected_section:
+            detected_section = is_section_header(stripped)
 
         if detected_section:
             current_section = detected_section
+            if colon_content and current_section in sections:
+                sections[current_section].append(colon_content)
             continue
 
-        if current_section != "other":
-            sections[current_section].append(line)
+        if current_section == "other":
+            intro_lines.append(stripped)
+        elif current_section in sections:
+            sections[current_section].append(stripped)
+
+    # If professional summary is empty, see if introductory lines contain a summary
+    summary_text = "\n".join(sections["professional_summary"]).strip()
+    if not summary_text and intro_lines:
+        # Check lines after candidate contact details
+        candidate_summary = []
+        for line in intro_lines[1:6]:
+            if len(line.split()) >= 6 and not re.search(r"[@\+]\d", line):
+                candidate_summary.append(line)
+        if candidate_summary:
+            sections["professional_summary"] = candidate_summary
 
     return {
         key: "\n".join(value).strip()
@@ -419,9 +525,21 @@ def observe_resume(file_path):
 
         "resume_category": classify_resume(skills),
 
-        "contact_information": {
+        "personal_information": {
+            "name": extract_name(text),
             "emails": extract_email(text),
             "phone_numbers": extract_phone(text),
+            "linkedin": extract_linkedin(text),
+            "github": extract_github(text),
+            "links": extract_links(text)
+        },
+
+        "contact_information": {
+            "name": extract_name(text),
+            "emails": extract_email(text),
+            "phone_numbers": extract_phone(text),
+            "linkedin": extract_linkedin(text),
+            "github": extract_github(text),
             "links": extract_links(text)
         },
 

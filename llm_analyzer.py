@@ -132,11 +132,11 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
     observed = observe_resume(pdf_path) if observe_resume else {}
     extracted = extract_field_analysis(pdf_path) if extract_field_analysis else {}
 
-    resume_text = observed.get("text", "")
+    resume_text = observed.get("full_text") or observed.get("text", "")
     if not resume_text.strip():
         import pymupdf
         with pymupdf.open(pdf_path) as doc:
-            resume_text = "\n".join(page.get_text() for page in doc)
+            resume_text = "\n".join(page.get_text("text", sort=True) for page in doc)
 
     skill_predictions = []
     if predict_skills is not None and resume_text.strip():
@@ -145,13 +145,26 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
         except Exception:
             pass
 
+    personal_info = observed.get("personal_information") or extracted.get("personal_information", {})
+    summary = extracted.get("professional_summary") or observed.get("professional_summary", "")
+    objective = extracted.get("career_objective") or observed.get("career_objective", "")
+
+    # If neither summary nor objective was explicitly found, synthesize an executive summary
+    if not summary and not objective:
+        category = observed.get("resume_category", "Professional")
+        quals = extracted.get("education", {}).get("possible_qualifications", [])
+        top_qual = quals[0] if quals else "relevant academic credentials"
+        top_skills = [p["skill"] for p in skill_predictions if p.get("predicted_present")][:4]
+        skills_str = ", ".join(top_skills) if top_skills else "specialized domain competencies"
+        summary = f"{category} candidate with {top_qual} and verified expertise in {skills_str}."
+
     result = {
         "engine": "Resumind Custom PyTorch AI",
         "file_name": pdf_path.name,
         "resume_category": observed.get("resume_category", "Technical Professional"),
-        "personal_information": observed.get("personal_information", {}),
-        "professional_summary": extracted.get("professional_summary", ""),
-        "career_objective": extracted.get("career_objective", ""),
+        "personal_information": personal_info,
+        "professional_summary": summary,
+        "career_objective": objective,
         "education": extracted.get("education", {}),
         "experience": extracted.get("experience", {}),
         "skills": observed.get("skills", {}),

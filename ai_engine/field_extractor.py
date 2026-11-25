@@ -23,10 +23,14 @@ def extract_education(text):
         r"\bM\.?A\b|\bMaster of Arts\b",
         r"\bB\.?C\.?A\b|\bBachelor of Computer Applications\b",
         r"\bM\.?C\.?A\b|\bMaster of Computer Applications\b",
+        r"\bB\.?B\.?A\b|\bBachelor of Business Administration\b",
         r"\bMBA\b|\bMaster of Business Administration\b",
         r"\bPh\.?D\b|\bDoctor of Philosophy\b",
         r"\bDiploma\b",
-        r"\bHigher Secondary\b",
+        r"\bClass\s*(?:XII|X|12th?|10th?)\b",
+        r"\b(?:ISC|ICSE|CBSE|State\s*Board|Matriculation|Intermediate)\b",
+        r"\b(?:Senior\s*Secondary|Higher\s*Secondary|High\s*School)\b",
+        r"\b(?:Secondary\s*Education|Board\s*Examination)\b",
         r"\bSecondary\b"
     ]
 
@@ -98,19 +102,22 @@ def extract_field_analysis(pdf_path):
         "career_category": observed["resume_category"],
 
         "personal_information": {
-            "emails": observed["contact_information"]["emails"],
-            "phone_numbers": observed["contact_information"]["phone_numbers"],
-            "links": observed["contact_information"]["links"]
+            "name": observed.get("personal_information", {}).get("name", "Candidate"),
+            "emails": observed.get("personal_information", {}).get("emails", []),
+            "phone_numbers": observed.get("personal_information", {}).get("phone_numbers", []),
+            "linkedin": observed.get("personal_information", {}).get("linkedin", ""),
+            "github": observed.get("personal_information", {}).get("github", ""),
+            "links": observed.get("personal_information", {}).get("links", [])
         },
 
-        "professional_summary": observed["professional_summary"],
+        "professional_summary": observed.get("professional_summary", ""),
 
-        "career_objective": observed["career_objective"],
+        "career_objective": observed.get("career_objective", ""),
 
         "education": {
-            "section_text": observed["education"],
-            "possible_qualifications": extract_education(text),
-            "years_found": extract_years(text)
+            "section_text": observed.get("education", ""),
+            "possible_qualifications": extract_education(observed.get("education") or text),
+            "years_found": extract_years(observed.get("education") or text)
         },
 
         "experience": {

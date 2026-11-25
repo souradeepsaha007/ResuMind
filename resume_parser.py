@@ -4,15 +4,25 @@ import pymupdf
 
 
 def extract_resume_text(pdf_path):
-    """Extracts plain text from a given PDF resume path using PyMuPDF."""
+    """Extracts clean plain text from a given PDF resume path using PyMuPDF."""
     pdf_path = Path(pdf_path)
     if not pdf_path.exists():
         raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
-    document = pymupdf.open(pdf_path)
-    resume_text = "\n".join(page.get_text() for page in document)
-    document.close()
-    return resume_text
+    text_parts = []
+    with pymupdf.open(pdf_path) as document:
+        for page in document:
+            # Sort text in logical reading order
+            page_text = page.get_text("text", sort=True)
+            if not page_text or len(page_text.strip()) < 15:
+                blocks = page.get_text("blocks")
+                page_text = "\n".join(b[4] for b in blocks if len(b) > 4 and str(b[4]).strip())
+            if page_text.strip():
+                text_parts.append(page_text)
+
+    raw_text = "\n".join(text_parts)
+    raw_text = raw_text.replace("\xa0", " ").replace("\x00", " ")
+    return raw_text.strip()
 
 
 if __name__ == "__main__":

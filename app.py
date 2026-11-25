@@ -251,18 +251,25 @@ if "analysis_result" not in st.session_state:
 def extract_pdf_text(uploaded_file):
 
     pdf_bytes = uploaded_file.getvalue()
+    text_parts = []
 
     with pymupdf.open(
         stream=pdf_bytes,
         filetype="pdf"
     ) as document:
 
-        text = "\n".join(
-            page.get_text("text")
-            for page in document
-        )
+        for page in document:
+            # Sort text in logical reading order
+            page_text = page.get_text("text", sort=True)
+            if not page_text or len(page_text.strip()) < 15:
+                blocks = page.get_text("blocks")
+                page_text = "\n".join(b[4] for b in blocks if len(b) > 4 and str(b[4]).strip())
+            if page_text.strip():
+                text_parts.append(page_text)
 
-    return text.strip()
+    raw_text = "\n".join(text_parts)
+    raw_text = raw_text.replace("\xa0", " ").replace("\x00", " ")
+    return raw_text.strip()
 
 
 # ==========================================================
@@ -277,8 +284,20 @@ def extract_candidate_information(text):
     )
 
     phone_match = re.search(
-        r'(?<!\d)(?:\+?\d{1,3}[\s.-]?)?(?:\d[\s.-]?){9,12}(?!\d)',
+        r'(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,5}\)?[\s.-]?)?\d{3,5}[\s.-]?\d{4,5}',
         text
+    )
+
+    linkedin_match = re.search(
+        r'(?:https?://)?(?:www\.)?linkedin\.com/(?:in|pub)/[a-zA-Z0-9_\-]+',
+        text,
+        re.IGNORECASE
+    )
+
+    github_match = re.search(
+        r'(?:https?://)?(?:www\.)?github\.com/[a-zA-Z0-9_\-]+',
+        text,
+        re.IGNORECASE
     )
 
     lines = [
@@ -287,31 +306,34 @@ def extract_candidate_information(text):
         if line.strip()
     ]
 
-    candidate_name = "Not confidently identified"
+    candidate_name = "Candidate"
 
     excluded_words = [
-        "resume",
-        "curriculum vitae",
-        "email",
-        "phone",
-        "mobile",
-        "linkedin",
-        "github"
+        "resume", "curriculum vitae", "cv", "email",
+        "phone", "mobile", "linkedin", "github",
+        "portfolio", "address", "profile", "summary",
+        "objective", "education", "experience", "skills",
+        "developer", "engineer"
     ]
 
-    for line in lines[:8]:
-
+    for line in lines[:10]:
+        clean_line = re.sub(r'^[•*|✦\s\d\.-]+', '', line).strip()
+        words = clean_line.split()
         if (
-            len(line.split()) <= 5
-            and len(line) <= 60
-            and not re.search(r'[@\d]', line)
-            and not any(
-                word in line.lower()
-                for word in excluded_words
-            )
+            1 <= len(words) <= 4
+            and len(clean_line) <= 45
+            and not re.search(r'[@\d:/\\{}<>]', clean_line)
+            and not any(word in clean_line.lower() for word in excluded_words)
+            and any(c.isalpha() for c in clean_line)
         ):
-            candidate_name = line
+            candidate_name = clean_line
             break
+
+    phone_str = "Not found"
+    if phone_match:
+        digits = re.sub(r'\D', '', phone_match.group(0))
+        if 10 <= len(digits) <= 13:
+            phone_str = phone_match.group(0).strip()
 
     return {
         "name": candidate_name,
@@ -319,10 +341,9 @@ def extract_candidate_information(text):
             email_match.group(0)
             if email_match else "Not found"
         ),
-        "phone": (
-            phone_match.group(0).strip()
-            if phone_match else "Not found"
-        )
+        "phone": phone_str,
+        "linkedin": linkedin_match.group(0) if linkedin_match else "",
+        "github": github_match.group(0) if github_match else ""
     }
 
 
@@ -441,7 +462,7 @@ def create_pdf_report(result):
 
         story.append(
             Paragraph(
-                "Soura Resume AI - Career Analysis Report",
+                "Resumind AI - Executive Career & Skills Analysis Report",
                 styles["Heading2"]
             )
         )
@@ -628,27 +649,14 @@ with nav3:
 
 if st.session_state.page == "Home":
 
-    st.markdown("""
-    <div class="hero">
-
-        <span class="hero-tag">
-            ✦ SOURA RESUME AI ENGINE
-        </span>
-
-        <h1>
-            A sharper resume.<br>
-            <em>Your next defining role.</em>
-        </h1>
-
-        <p>
-            Analyse your professional experience, discover your
-            strengths and understand how your qualifications align
-            with your next career opportunity.
-            Supporting IT and non-IT resume analysis.
-        </p>
-
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero">'
+        '<span class="hero-tag">✦ RESUMIND AI ENGINE</span>'
+        '<h1>A sharper resume.<br><em>Your next defining role.</em></h1>'
+        '<p>Analyse your professional experience, discover your strengths and understand how your qualifications align with your next career opportunity. Supporting IT and non-IT resume analysis.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
     center1, center2, center3 = st.columns([1, 1.5, 1])
 
@@ -662,11 +670,10 @@ if st.session_state.page == "Home":
             st.session_state.page = "Analysis"
             st.rerun()
 
-    st.markdown("""
-    <div class="section-heading">
-        Core Capabilities
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-heading">Core Capabilities</div>',
+        unsafe_allow_html=True
+    )
 
     c1, c2, c3 = st.columns(3)
 
@@ -688,18 +695,18 @@ if st.session_state.page == "Home":
         ),
         (
             "04",
-            "Skill Analysis",
-            "Use the Soura skill model when trained weights are available."
+            "Neural SkillNet",
+            "Use your custom PyTorch neural model trained on your RTX 2050 GPU."
         ),
         (
             "05",
             "Resume Diagnostics",
-            "Review missing sections, qualifications and possible improvements."
+            "Review missing sections, qualifications and actionable suggestions."
         ),
         (
             "06",
             "Executive Reporting",
-            "Export a structured analysis as a JSON file or PDF report."
+            "Export a professional structured PDF career analysis report."
         )
     ]
 
@@ -708,23 +715,22 @@ if st.session_state.page == "Home":
         with [c1, c2, c3][index % 3]:
 
             st.markdown(
-                f"""
-                <div class="feature-card">
-                    <span class="section-tag">MODULE {number}</span>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                </div>
-                """,
+                f'<div class="feature-card">'
+                f'<span class="section-tag">MODULE {number}</span>'
+                f'<h3>{title}</h3>'
+                f'<p>{description}</p>'
+                f'</div>',
                 unsafe_allow_html=True
             )
 
-    st.markdown("""
-    <div class="footer">
-        <div class="brand">RESUMIND <span>AI</span></div>
-        Your Resume. Your Skills. Your Next Opportunity.<br>
-        © 2026 Resumind AI
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="footer">'
+        '<div class="brand">RESUMIND <span>AI</span></div>'
+        'Your Resume. Your Skills. Your Next Opportunity.<br>'
+        '&copy; 2026 Resumind AI'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
 
 # ==========================================================
@@ -733,26 +739,14 @@ if st.session_state.page == "Home":
 
 if st.session_state.page == "Analysis":
 
-    st.markdown("""
-    <div class="hero">
-
-        <span class="hero-tag">
-            RESUME EVALUATION STUDIO
-        </span>
-
-        <h1>
-            Resume Analysis<br>
-            <em>Studio</em>
-        </h1>
-
-        <p>
-            Upload your PDF resume. Soura Resume AI will inspect
-            your professional background, identify skills and
-            organise your career information.
-        </p>
-
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero">'
+        '<span class="hero-tag">RESUME EVALUATION STUDIO</span>'
+        '<h1>Resume Analysis<br><em>Studio</em></h1>'
+        '<p>Upload your PDF resume. Resumind AI will inspect your professional background, identify skills and organise your career information.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
     input1, input2 = st.columns([1, 1])
 
@@ -800,7 +794,7 @@ if st.session_state.page == "Analysis":
             try:
 
                 with st.spinner(
-                    "Soura Resume AI is analysing your resume..."
+                    "Resumind AI is analysing your resume..."
                 ):
 
                     # Extract text for candidate information
@@ -831,7 +825,7 @@ if st.session_state.page == "Analysis":
 
                     try:
 
-                        # Run Soura Resume AI
+                        # Run Resumind AI Engine
                         soura_result = analyze_resume(
                             temp_pdf_path,
                             job_description
@@ -842,6 +836,16 @@ if st.session_state.page == "Analysis":
                         temp_pdf_path.unlink(
                             missing_ok=True
                         )
+
+                    # Sync candidate details into personal_information
+                    if candidate and isinstance(candidate, dict):
+                        if not soura_result.get("personal_information"):
+                            soura_result["personal_information"] = candidate
+                        else:
+                            for k, v in candidate.items():
+                                curr_v = soura_result["personal_information"].get(k)
+                                if v and (not curr_v or curr_v in ("Candidate", "Not found", [])):
+                                    soura_result["personal_information"][k] = v
 
                     # Optional job matching
                     if job_description.strip():
@@ -879,7 +883,7 @@ if st.session_state.page == "Analysis":
                     }
 
                 st.success(
-                    "Soura Resume AI analysis completed!"
+                    "Resumind AI analysis completed!"
                 )
 
             except Exception as error:
@@ -988,10 +992,14 @@ if (
 
     else:
 
-        st.info(
-            "No job description provided. "
-            "General resume analysis is available."
-        )
+        info_c1, info_c2 = st.columns([2.5, 1])
+        with info_c1:
+            st.info(
+                "💡 **No Target Job Description Provided** — General resume analysis and neural skill predictions are displayed below. "
+                "Paste a job description in the analysis studio to calculate real-time match percentage, keyword gaps, and ATS alignment."
+            )
+        with info_c2:
+            st.metric("Target Job Status", "Awaiting Job Desc")
 
     # ------------------------------------------------------
     # MATCHED AND MISSING SKILLS
@@ -1110,24 +1118,23 @@ if (
         )
 
     # ------------------------------------------------------
-    # PROFESSIONAL SUMMARY
+    # PROFESSIONAL SUMMARY & OBJECTIVE
     # ------------------------------------------------------
 
-    st.divider()
+    summary_text = (data.get("professional_summary") or "").strip()
+    objective_text = (data.get("career_objective") or "").strip()
 
-    st.markdown("### Professional Summary")
+    if summary_text or objective_text:
 
-    st.write(
-        data["professional_summary"]
-        or "No summary section detected."
-    )
+        st.divider()
 
-    st.markdown("### Career Objective")
+        if summary_text:
+            st.markdown("### Professional Summary")
+            st.write(summary_text)
 
-    st.write(
-        data["career_objective"]
-        or "No career objective detected."
-    )
+        if objective_text and objective_text != summary_text:
+            st.markdown("### Career Objective")
+            st.write(objective_text)
 
     # ------------------------------------------------------
     # EDUCATION
@@ -1263,7 +1270,7 @@ if (
 
     st.divider()
 
-    with st.expander("View Complete Soura AI Analysis"):
+    with st.expander("View Complete Resumind AI Analysis"):
 
         st.json(data, expanded=True)
 
@@ -1275,47 +1282,23 @@ if (
 
     st.markdown("### Export Your Report")
 
-    json_bytes = json.dumps(
-        {
-            "candidate": candidate,
-            "analysis": data,
-            "job_match": match
-        },
-        indent=4,
-        ensure_ascii=False
-    ).encode("utf-8")
+    pdf_bytes = create_pdf_report(result)
 
-    download1, download2 = st.columns(2)
-
-    with download1:
+    if pdf_bytes:
 
         st.download_button(
-            "DOWNLOAD JSON REPORT",
-            data=json_bytes,
-            file_name="soura_resume_analysis.json",
-            mime="application/json",
+            "DOWNLOAD PDF REPORT",
+            data=pdf_bytes,
+            file_name="Resumind_AI_Report.pdf",
+            mime="application/pdf",
             use_container_width=True
         )
 
-    with download2:
+    else:
 
-        pdf_bytes = create_pdf_report(result)
-
-        if pdf_bytes:
-
-            st.download_button(
-                "DOWNLOAD PDF REPORT",
-                data=pdf_bytes,
-                file_name="Soura_Resume_AI_Report.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
-
-        else:
-
-            st.warning(
-                "Install reportlab to enable PDF reports."
-            )
+        st.warning(
+            "Install reportlab to enable PDF reports."
+        )
 
     # ------------------------------------------------------
     # NEW ANALYSIS
