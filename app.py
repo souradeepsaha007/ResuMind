@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 
 from llm_analyzer import analyze_resume
 from ai_engine.resume_observer import SKILL_DATABASE
+from interview_engine import generate_interview_test, evaluate_test, generate_interview_pdf_report
 
 
 # ==========================================================
@@ -519,6 +520,15 @@ if "page" not in st.session_state:
 if "analysis_result" not in st.session_state:
     st.session_state.analysis_result = None
 
+if "interview_test" not in st.session_state:
+    st.session_state.interview_test = None
+
+if "interview_answers" not in st.session_state:
+    st.session_state.interview_answers = {}
+
+if "interview_eval" not in st.session_state:
+    st.session_state.interview_eval = None
+
 
 # ==========================================================
 # 4. PDF TEXT EXTRACTION
@@ -900,7 +910,7 @@ def create_pdf_report(result):
 # 9. NAVIGATION
 # ==========================================================
 
-nav1, nav2, nav3 = st.columns([2.5, 1, 1])
+nav1, nav2, nav3, nav4 = st.columns([2.2, 1, 1, 1.3])
 
 with nav1:
 
@@ -921,6 +931,13 @@ with nav3:
     if st.button("ANALYSER", use_container_width=True):
 
         st.session_state.page = "Analysis"
+        st.rerun()
+
+with nav4:
+
+    if st.button("MOCK INTERVIEW 🎯", use_container_width=True):
+
+        st.session_state.page = "Interview"
         st.rerun()
 
 
@@ -1637,6 +1654,44 @@ if (
         )
 
     # ------------------------------------------------------
+    # MOCK INTERVIEW CALLOUT
+    # ------------------------------------------------------
+
+    st.divider()
+
+    st.markdown(
+        '<div style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); '
+        'border: 1px solid #C7D2FE; border-radius: 20px; padding: 24px 28px; margin: 15px 0;">'
+        '<span style="display:inline-block; background:#4263EB; color:#FFFFFF; '
+        'border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700; '
+        'letter-spacing:.08em; margin-bottom:10px;">✦ NEXT STEP: INTERVIEW PREPARATION</span>'
+        '<h3 style="margin:4px 0 8px 0; color:#1E1B4B; font-size:20px; font-weight:700;">'
+        'Test Your Knowledge with an AI Mock Interview</h3>'
+        '<p style="margin:0 0 16px 0; color:#3730A3; font-size:14px; line-height:1.6;">'
+        'Take an interactive test calibrated directly to your resume\'s detected skills '
+        'and career category. Practice technical questions, review scenario challenges, '
+        'and get instant readiness feedback with interviewer insights.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    if st.button("START MOCK INTERVIEW TEST BASED ON THIS RESUME →", type="primary", key="btn_start_interview_from_resume", use_container_width=True):
+        candidate_skills = list(match.get("resume_skills") or [])
+        if not candidate_skills and data.get("skills"):
+            for s_list in data["skills"].values():
+                candidate_skills.extend(s_list)
+        st.session_state.interview_test = generate_interview_test(
+            candidate_skills=candidate_skills,
+            resume_category=data.get("resume_category"),
+            num_questions=5,
+            focus_mode="Balanced Mock Interview"
+        )
+        st.session_state.interview_answers = {}
+        st.session_state.interview_eval = None
+        st.session_state.page = "Interview"
+        st.rerun()
+
+    # ------------------------------------------------------
     # DOWNLOAD REPORTS
     # ------------------------------------------------------
 
@@ -1681,6 +1736,300 @@ if (
         '<div class="footer">'
         '<div class="brand">RESUMIND <span>AI</span></div>'
         'Powered by Resumind AI<br>'
+        '&copy; 2026 Resumind AI'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# 12. INTERVIEW PREP & SKILL TEST STUDIO
+# ==========================================================
+
+if st.session_state.page == "Interview":
+
+    st.markdown(
+        '<div class="hero">'
+        '<span class="hero-tag">✦ AI INTERVIEW PREPARATION STUDIO</span>'
+        '<h1>Interactive Mock Interview<br><em>& Skill Test</em></h1>'
+        '<p>Test your competencies with questions tailored directly to your skills and domain. Get immediate evaluation, interview readiness grades, and detailed interviewer insights.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    # STATE 1: CONFIGURATION (No active test yet)
+    if st.session_state.interview_test is None:
+        has_resume = (st.session_state.analysis_result is not None)
+        active_skills = []
+        active_name = "Candidate"
+        active_cat = "IT & SOFTWARE"
+
+        if has_resume:
+            res = st.session_state.analysis_result
+            active_name = res["candidate"]["name"]
+            active_cat = res["soura_result"]["resume_category"]
+            active_skills = list(res["match_data"].get("resume_skills") or [])
+            if not active_skills and res["soura_result"].get("skills"):
+                for slist in res["soura_result"]["skills"].values():
+                    active_skills.extend(slist)
+
+        # Config Panel
+        with st.container(border=True):
+            st.markdown(
+                '<div class="upload-panel-header">'
+                '<span class="panel-badge">TEST CONFIGURATION</span>'
+                '<h4>Configure Your Mock Interview</h4>'
+                '<p class="panel-desc">Customize your assessment focus, domain alignment, and question volume.</p>'
+                '</div>',
+                unsafe_allow_html=True
+            )
+
+            if has_resume and active_skills:
+                st.info(
+                    f"🎯 **Resume Synchronized:** Testing skills detected in **{active_name}'s** resume ({active_cat}): "
+                    f"*{', '.join(active_skills[:12])}*"
+                )
+            else:
+                st.info(
+                    "💡 **No Resume Uploaded Yet:** You can choose your skills manually below, or upload a resume in the **ANALYSER** tab for auto-calibration."
+                )
+
+            c1, c2 = st.columns(2, gap="medium")
+            with c1:
+                focus_mode = st.selectbox(
+                    "Interview Focus Area",
+                    options=["Balanced Mock Interview", "Technical Only", "Behavioral & Leadership"],
+                    index=0,
+                    help="Balanced includes both technical knowledge and behavioral scenario questions."
+                )
+
+            with c2:
+                num_q = st.select_slider(
+                    "Number of Questions",
+                    options=[3, 5, 8, 10, 15],
+                    value=5
+                )
+
+            # Manual skill override / addition if desired
+            all_known_skills = []
+            for slist in SKILL_DATABASE.values():
+                all_known_skills.extend(slist)
+            all_known_skills = sorted(list(set(all_known_skills)))
+
+            default_skills = [s for s in active_skills if s in all_known_skills] or ["Python", "SQL", "Git", "Problem Solving"]
+            selected_skills = st.multiselect(
+                "Target Skills to Test",
+                options=all_known_skills,
+                default=default_skills[:8],
+                help="Add or remove skills to tailor the questions."
+            )
+
+            st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
+
+            if st.button("GENERATE & START TEST →", type="primary", use_container_width=True):
+                test_questions = generate_interview_test(
+                    candidate_skills=selected_skills,
+                    resume_category=active_cat,
+                    num_questions=num_q,
+                    focus_mode=focus_mode
+                )
+                st.session_state.interview_test = test_questions
+                st.session_state.interview_answers = {}
+                st.session_state.interview_eval = None
+                st.rerun()
+
+    # STATE 2: ACTIVE TEST IN PROGRESS
+    elif st.session_state.interview_eval is None:
+        questions = st.session_state.interview_test
+        total_q = len(questions)
+
+        top_col1, top_col2 = st.columns([3, 1])
+        with top_col1:
+            st.markdown(
+                f'<span class="section-tag">ASSESSMENT IN PROGRESS</span>'
+                f'<div class="section-heading" style="font-size:26px; margin:10px 0;">'
+                f'Answer the following {total_q} questions</div>',
+                unsafe_allow_html=True
+            )
+        with top_col2:
+            if st.button("RESET TEST ✕", type="secondary", use_container_width=True):
+                st.session_state.interview_test = None
+                st.session_state.interview_answers = {}
+                st.session_state.interview_eval = None
+                st.rerun()
+
+        st.progress(
+            len(st.session_state.interview_answers) / max(1, total_q),
+            text=f"Completed {len(st.session_state.interview_answers)} of {total_q} questions"
+        )
+
+        for q in questions:
+            q_id = q["test_id"]
+            current_choice = st.session_state.interview_answers.get(q_id, None)
+
+            with st.container(border=True):
+                st.markdown(
+                    f'<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">'
+                    f'<div>'
+                    f'<span class="panel-badge">QUESTION {q["question_number"]} OF {total_q}</span> '
+                    f'<span class="skill-tag" style="margin:0 4px;">{escape(q["skill"])}</span>'
+                    f'</div>'
+                    f'<span style="font-size:11px; font-weight:600; color:#64748B; background:#F1F5F9; border-radius:20px; padding:3px 10px;">{escape(q["difficulty"])}</span>'
+                    f'</div>'
+                    f'<h4 style="margin:8px 0 14px 0; color:#0F172A; font-size:16px; font-weight:600; line-height:1.5;">'
+                    f'{escape(q["question"])}</h4>',
+                    unsafe_allow_html=True
+                )
+
+                selected_opt = st.radio(
+                    label=f"q_label_{q_id}",
+                    options=q["options"],
+                    index=current_choice if current_choice is not None else None,
+                    key=f"radio_{q_id}",
+                    label_visibility="collapsed"
+                )
+
+                if selected_opt is not None:
+                    st.session_state.interview_answers[q_id] = q["options"].index(selected_opt)
+
+        st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
+
+        if st.button("SUBMIT TEST & VIEW EVALUATION →", type="primary", use_container_width=True):
+            if len(st.session_state.interview_answers) < total_q:
+                st.warning(f"Please answer all {total_q} questions before submitting (currently answered: {len(st.session_state.interview_answers)}).")
+            else:
+                eval_result = evaluate_test(st.session_state.interview_test, st.session_state.interview_answers)
+                st.session_state.interview_eval = eval_result
+                st.rerun()
+
+    # STATE 3: TEST EVALUATION & DETAILED RESULTS
+    else:
+        eval_res = st.session_state.interview_eval
+        score_pct = eval_res["score_pct"]
+        correct_count = eval_res["correct_count"]
+        total_q = eval_res["total"]
+        tier = eval_res["tier"]
+
+        candidate_name = "Candidate"
+        if st.session_state.analysis_result:
+            candidate_name = st.session_state.analysis_result["candidate"]["name"]
+
+        # Results Hero Card
+        st.markdown(
+            f'<div style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 20px; padding: 28px; '
+            f'box-shadow: 0 4px 16px rgba(0,0,0,0.03); text-align: center; margin-bottom: 25px;">'
+            f'<span class="panel-badge">EVALUATION COMPLETE</span>'
+            f'<h1 style="font-family:\'Instrument Serif\', serif; font-size: 56px; margin: 10px 0; color: #0F172A;">'
+            f'{score_pct}%</h1>'
+            f'<div style="font-size: 17px; font-weight: 700; color: {eval_res["readiness_color"]}; margin-bottom: 8px;">'
+            f'{eval_res["readiness_badge"]}</div>'
+            f'<p style="color: #64748B; font-size: 14px; margin: 0;">'
+            f'Answered <b>{correct_count}</b> out of <b>{total_q}</b> questions correctly</p>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        # Performance Metrics
+        m1, m2, m3 = st.columns(3)
+        with m1:
+            st.metric("Score", f"{score_pct}%")
+        with m2:
+            st.metric("Correct Answers", f"{correct_count} / {total_q}")
+        with m3:
+            st.metric("Readiness Tier", tier)
+
+        # Per-Skill Mastery Breakdown
+        if eval_res.get("skill_stats"):
+            st.divider()
+            st.markdown(
+                '<span class="section-tag">COMPETENCY ACCURACY</span>'
+                '<div class="section-heading">Skill-by-Skill Breakdown</div>',
+                unsafe_allow_html=True
+            )
+
+            skill_cols = st.columns(min(4, max(1, len(eval_res["skill_stats"]))))
+            for idx, (sname, sdata) in enumerate(eval_res["skill_stats"].items()):
+                col = skill_cols[idx % len(skill_cols)]
+                with col:
+                    col_score = round((sdata["correct"] / sdata["total"]) * 100)
+                    with st.container(border=True):
+                        st.markdown(f"**{escape(sname)}**")
+                        st.markdown(f"Accuracy: **{col_score}%** ({sdata['correct']}/{sdata['total']})")
+
+        # Weak skills alert
+        if eval_res.get("weak_skills"):
+            st.warning(
+                f"💡 **Recommended Revision:** Focus your final interview prep on: "
+                f"**{', '.join(eval_res['weak_skills'])}**."
+            )
+        else:
+            st.success("🎉 Outstanding! You answered every question correctly across all tested skill domains!")
+
+        # Detailed Question Review
+        st.divider()
+        st.markdown(
+            '<span class="section-tag">DETAILED REVIEW</span>'
+            '<div class="section-heading">Question-by-Question Analysis & Interviewer Insights</div>',
+            unsafe_allow_html=True
+        )
+
+        for item in eval_res["review"]:
+            is_corr = item["is_correct"]
+            bg_card = "#F0FDF4" if is_corr else "#FEF2F2"
+            border_card = "#BBF7D0" if is_corr else "#FECACA"
+            header_color = "#166534" if is_corr else "#991B1B"
+            status_text = "✓ CORRECT" if is_corr else "✕ INCORRECT"
+
+            st.markdown(
+                f'<div style="background:{bg_card}; border:1px solid {border_card}; border-radius:16px; padding:20px; margin-bottom:18px;">'
+                f'<div style="display:flex; justify-content:space-between; margin-bottom:8px;">'
+                f'<span style="font-weight:700; color:{header_color}; font-size:12px; letter-spacing:.05em;">'
+                f'{status_text} • QUESTION {item["question_number"]} ({escape(item["skill"])})</span>'
+                f'</div>'
+                f'<h4 style="margin:4px 0 12px 0; color:#0F172A; font-size:16px; line-height:1.5;">'
+                f'{escape(item["question"])}</h4>'
+                f'<p style="margin:4px 0; font-size:14px; color:#334155;"><b>Your Answer:</b> '
+                f'<span style="color:{"#166534" if is_corr else "#DC2626"};">{escape(item["user_answer_text"])}</span></p>'
+                f'{"<p style=\'margin:4px 0; font-size:14px; color:#166534;\'><b>Correct Answer:</b> " + escape(item["correct_answer_text"]) + "</p>" if not is_corr else ""}'
+                f'<div style="margin-top:12px; padding-top:10px; border-top:1px dashed {border_card};">'
+                f'<p style="margin:4px 0; font-size:13px; color:#475569; line-height:1.6;"><b>Explanation:</b> {escape(item["explanation"])}</p>'
+                f'<p style="margin:6px 0 0 0; font-size:13px; color:#364FC7; line-height:1.6;"><b>💡 Interviewer Insight:</b> {escape(item["insight"])}</p>'
+                f'</div>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+        # Download & Next Steps
+        st.divider()
+        st.markdown("### Export & Next Steps")
+
+        pdf_bytes = generate_interview_pdf_report(candidate_name, eval_res)
+        if pdf_bytes:
+            st.download_button(
+                "DOWNLOAD INTERVIEW READINESS REPORT (PDF)",
+                data=pdf_bytes,
+                file_name=f"Interview_Readiness_{candidate_name.replace(' ', '_')}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+
+        retake_c1, retake_c2 = st.columns(2)
+        with retake_c1:
+            if st.button("TAKE A NEW TEST ↻", type="secondary", use_container_width=True):
+                st.session_state.interview_test = None
+                st.session_state.interview_answers = {}
+                st.session_state.interview_eval = None
+                st.rerun()
+
+        with retake_c2:
+            if st.button("BACK TO RESUME AUDIT →", type="secondary", use_container_width=True):
+                st.session_state.page = "Analysis"
+                st.rerun()
+
+    st.markdown(
+        '<div class="footer">'
+        '<div class="brand">RESUMIND <span>AI</span></div>'
+        'AI Career Readiness & Interview Prep<br>'
         '&copy; 2026 Resumind AI'
         '</div>',
         unsafe_allow_html=True
