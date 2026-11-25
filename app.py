@@ -14,6 +14,7 @@ import plotly.graph_objects as go
 from llm_analyzer import analyze_resume
 from ai_engine.resume_observer import SKILL_DATABASE
 from interview_engine import generate_interview_test, evaluate_test, generate_interview_pdf_report
+from job_predictor import predict_job_options, JOB_CATALOG
 
 
 # ==========================================================
@@ -910,7 +911,7 @@ def create_pdf_report(result):
 # 9. NAVIGATION
 # ==========================================================
 
-nav1, nav2, nav3, nav4 = st.columns([2.2, 1, 1, 1.3])
+nav1, nav2, nav3, nav4, nav5 = st.columns([2.0, 0.9, 0.9, 1.2, 1.2])
 
 with nav1:
 
@@ -934,6 +935,13 @@ with nav3:
         st.rerun()
 
 with nav4:
+
+    if st.button("CAREER PATHS 🧭", use_container_width=True):
+
+        st.session_state.page = "CareerPaths"
+        st.rerun()
+
+with nav5:
 
     if st.button("MOCK INTERVIEW 🎯", use_container_width=True):
 
@@ -1265,6 +1273,117 @@ if (
         f"Analysis engine: {data['engine']} | "
         f"Model status: {data.get('trained_model_status', 'Not available')}"
     )
+
+    # ------------------------------------------------------
+    # JOB PREDICTION & CAREER PATH RECOMMENDATIONS
+    # ------------------------------------------------------
+
+    st.divider()
+
+    st.markdown(
+        '<span class="section-tag">AI CAREER RADAR</span>'
+        '<div class="section-heading">Top Predicted Job Roles & Career Paths</div>',
+        unsafe_allow_html=True
+    )
+    st.caption("Resumind AI evaluated your detected competencies against market roles to identify your highest-conviction career options, personalized fit reasons, and direct application links.")
+
+    # Collect all candidate skills
+    candidate_skills_for_pred = list(match.get("resume_skills") or [])
+    if not candidate_skills_for_pred and data.get("skills"):
+        for slist in data["skills"].values():
+            candidate_skills_for_pred.extend(slist)
+    for p in data.get("trained_skill_predictions", []):
+        if p.get("predicted_present") and p.get("skill") not in candidate_skills_for_pred:
+            candidate_skills_for_pred.append(p["skill"])
+
+    predicted_roles = predict_job_options(
+        candidate_skills=candidate_skills_for_pred,
+        resume_category=data.get("resume_category"),
+        top_n=3
+    )
+
+    if predicted_roles:
+        for role_idx, role in enumerate(predicted_roles):
+            with st.container(border=True):
+                # Header row
+                rc1, rc2 = st.columns([3, 1])
+                with rc1:
+                    st.markdown(
+                        f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">'
+                        f'<span class="panel-badge">RECOMMENDED OPTION #{role_idx+1}</span>'
+                        f'<span style="font-size:11px; font-weight:600; color:#475569; background:#F1F5F9; border-radius:20px; padding:2px 8px;">{escape(role["category"])}</span>'
+                        f'</div>'
+                        f'<h3 style="margin:2px 0 6px 0; color:#0F172A; font-size:20px; font-weight:700;">'
+                        f'{escape(role["title"])}</h3>',
+                        unsafe_allow_html=True
+                    )
+                with rc2:
+                    st.markdown(
+                        f'<div style="text-align:right;">'
+                        f'<div style="font-family:\'Space Grotesk\', sans-serif; font-size:26px; font-weight:700; color:{role["suitability_color"]};">'
+                        f'{role["fit_score"]}%</div>'
+                        f'<span style="display:inline-block; font-size:11px; font-weight:700; color:{role["suitability_color"]}; background:{role["suitability_bg"]}; padding:3px 10px; border-radius:20px;">'
+                        f'{role["suitability_label"]}</span>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
+
+                st.markdown(f'<p style="color:#64748B; font-size:13px; margin:0 0 10px 0;">{escape(role["description"])}</p>', unsafe_allow_html=True)
+
+                # Custom Justification / Reason
+                st.markdown(
+                    f'<div style="background:#F8FAFC; border-left:3px solid {role["suitability_color"]}; padding:10px 14px; border-radius:6px; margin-bottom:12px;">'
+                    f'<div style="font-size:11px; font-weight:700; color:{role["suitability_color"]}; letter-spacing:.05em; text-transform:uppercase; margin-bottom:3px;">💡 Why this is a suitable fit:</div>'
+                    f'<div style="font-size:13px; color:#334155; line-height:1.5;">{role["reasoning"]}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+                # Skills comparison
+                sc1, sc2 = st.columns(2)
+                with sc1:
+                    st.markdown("**✓ Demonstrated Skills:**")
+                    if role["matched_skills"]:
+                        st.markdown("".join(f'<span class="skill-tag">✓ {escape(s)}</span>' for s in role["matched_skills"]), unsafe_allow_html=True)
+                    else:
+                        st.caption("Foundational overlap")
+                with sc2:
+                    st.markdown("**✦ Skills to Pick Up (Close the Gap):**")
+                    if role["skills_to_learn"]:
+                        st.markdown("".join(f'<span class="missing-tag">+ {escape(s)}</span>' for s in role["skills_to_learn"]), unsafe_allow_html=True)
+                    else:
+                        st.caption("You meet all core skill requirements!")
+
+                # Meta specs
+                st.markdown(
+                    f'<div style="font-size:12px; color:#64748B; margin-top:10px; border-top:1px solid #E2E8F0; padding-top:8px;">'
+                    f'<b>Compensation:</b> {escape(role["salary_range"])} &nbsp;|&nbsp; '
+                    f'<b>Market Demand:</b> {escape(role["market_demand"])} &nbsp;|&nbsp; '
+                    f'<b>Career Path:</b> {escape(role["growth_path"])}'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+                # Action Links
+                act1, act2, act3, act4 = st.columns([1, 1, 1, 1.3])
+                with act1:
+                    st.link_button("LinkedIn Jobs ↗", role["links"]["linkedin"], use_container_width=True)
+                with act2:
+                    st.link_button("Indeed Jobs ↗", role["links"]["indeed"], use_container_width=True)
+                with act3:
+                    st.link_button("Glassdoor ↗", role["links"]["glassdoor"], use_container_width=True)
+                with act4:
+                    if st.button("Practice Mock Test 🎯", key=f"btn_role_test_{role['id']}", type="secondary", use_container_width=True):
+                        st.session_state.interview_test = generate_interview_test(
+                            candidate_skills=role["matched_skills"] or candidate_skills_for_pred,
+                            resume_category=role["category"],
+                            num_questions=5,
+                            focus_mode="Balanced Mock Interview"
+                        )
+                        st.session_state.interview_answers = {}
+                        st.session_state.interview_eval = None
+                        st.session_state.page = "Interview"
+                        st.rerun()
 
     # ------------------------------------------------------
     # JOB MATCHING
@@ -2030,6 +2149,184 @@ if st.session_state.page == "Interview":
         '<div class="footer">'
         '<div class="brand">RESUMIND <span>AI</span></div>'
         'AI Career Readiness & Interview Prep<br>'
+        '&copy; 2026 Resumind AI'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# 13. CAREER PATHS & JOB PREDICTOR STUDIO
+# ==========================================================
+
+if st.session_state.page == "CareerPaths":
+
+    st.markdown(
+        '<div class="hero">'
+        '<span class="hero-tag">✦ AI CAREER ROADMAP & ROLE PREDICTOR</span>'
+        '<h1>Explore Suitable Job Roles<br><em>& Career Paths</em></h1>'
+        '<p>Discover roles precisely matched to your background, understand why each path fits your profile, identify target skills to learn, and apply directly with one click.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    has_resume = (st.session_state.analysis_result is not None)
+    active_skills = []
+    active_name = "Candidate"
+    active_cat = "IT & SOFTWARE"
+
+    if has_resume:
+        res = st.session_state.analysis_result
+        active_name = res["candidate"]["name"]
+        active_cat = res["soura_result"]["resume_category"]
+        active_skills = list(res["match_data"].get("resume_skills") or [])
+        if not active_skills and res["soura_result"].get("skills"):
+            for slist in res["soura_result"]["skills"].values():
+                active_skills.extend(slist)
+        for p in res["soura_result"].get("trained_skill_predictions", []):
+            if p.get("predicted_present") and p.get("skill") not in active_skills:
+                active_skills.append(p["skill"])
+
+        st.info(
+            f"🎯 **Personalized Career Predictions Active:** Analyzed for **{active_name}** ({active_cat}) "
+            f"based on {len(active_skills)} verified skills."
+        )
+    else:
+        st.info(
+            "💡 **Tip:** Upload your resume in the **ANALYSER** tab to calculate custom match percentages and personalized fit rationales. Below are all verified industry roles."
+        )
+
+    # Filter controls
+    all_categories = ["All Domains"] + sorted(list(set(j["category"] for j in JOB_CATALOG)))
+    sel_cat = st.segmented_control("Domain Filter", options=all_categories, default="All Domains")
+
+    # Predict or compute scores
+    if active_skills:
+        all_predicted = predict_job_options(
+            candidate_skills=active_skills,
+            resume_category=active_cat,
+            top_n=len(JOB_CATALOG)
+        )
+    else:
+        all_predicted = predict_job_options(
+            candidate_skills=["Python", "SQL", "Git"],
+            top_n=len(JOB_CATALOG)
+        )
+
+    # Filter by category if selected
+    if sel_cat and sel_cat != "All Domains":
+        display_roles = [r for r in all_predicted if r["category"] == sel_cat]
+    else:
+        display_roles = all_predicted
+
+    st.markdown(f'<div style="font-size:14px; color:#64748B; margin:12px 0 18px 0;">Showing <b>{len(display_roles)}</b> career options</div>', unsafe_allow_html=True)
+
+    for role_idx, role in enumerate(display_roles):
+        with st.container(border=True):
+            rcol1, rcol2 = st.columns([3, 1])
+            with rcol1:
+                st.markdown(
+                    f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">'
+                    f'<span class="panel-badge">ROLE #{role_idx+1}</span>'
+                    f'<span style="font-size:11px; font-weight:600; color:#475569; background:#F1F5F9; border-radius:20px; padding:2px 8px;">{escape(role["category"])}</span>'
+                    f'</div>'
+                    f'<h3 style="margin:2px 0 6px 0; color:#0F172A; font-size:21px; font-weight:700;">'
+                    f'{escape(role["title"])}</h3>',
+                    unsafe_allow_html=True
+                )
+            with rcol2:
+                if has_resume:
+                    st.markdown(
+                        f'<div style="text-align:right;">'
+                        f'<div style="font-family:\'Space Grotesk\', sans-serif; font-size:26px; font-weight:700; color:{role["suitability_color"]};">'
+                        f'{role["fit_score"]}%</div>'
+                        f'<span style="display:inline-block; font-size:11px; font-weight:700; color:{role["suitability_color"]}; background:{role["suitability_bg"]}; padding:3px 10px; border-radius:20px;">'
+                        f'{role["suitability_label"]}</span>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(
+                        f'<div style="text-align:right;">'
+                        f'<span style="font-size:12px; font-weight:700; color:#2563EB; background:#EFF6FF; padding:4px 12px; border-radius:20px;">'
+                        f'Demand: {escape(role["market_demand"])}</span>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
+
+            st.markdown(f'<p style="color:#64748B; font-size:13px; margin:0 0 10px 0;">{escape(role["description"])}</p>', unsafe_allow_html=True)
+
+            # Personalized Rationale
+            if has_resume:
+                st.markdown(
+                    f'<div style="background:#F8FAFC; border-left:3px solid {role["suitability_color"]}; padding:10px 14px; border-radius:6px; margin-bottom:12px;">'
+                    f'<div style="font-size:11px; font-weight:700; color:{role["suitability_color"]}; letter-spacing:.05em; text-transform:uppercase; margin-bottom:3px;">💡 Why this is a suitable path:</div>'
+                    f'<div style="font-size:13px; color:#334155; line-height:1.5;">{role["reasoning"]}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+            # Skills comparison
+            sc1, sc2 = st.columns(2)
+            with sc1:
+                st.markdown("**✓ Demonstrated Skills:**" if has_resume else "**Prerequisite Core Skills:**")
+                if has_resume and role["matched_skills"]:
+                    st.markdown("".join(f'<span class="skill-tag">✓ {escape(s)}</span>' for s in role["matched_skills"]), unsafe_allow_html=True)
+                elif not has_resume:
+                    job_obj = next((j for j in JOB_CATALOG if j["id"] == role["id"]), None)
+                    req_list = job_obj["required_skills"] if job_obj else []
+                    st.markdown("".join(f'<span class="skill-tag">{escape(s)}</span>' for s in req_list), unsafe_allow_html=True)
+                else:
+                    st.caption("Foundational overlap")
+
+            with sc2:
+                st.markdown("**✦ Skills to Pick Up (Close the Gap):**" if has_resume else "**Advantage / Bonus Skills:**")
+                if has_resume and role["skills_to_learn"]:
+                    st.markdown("".join(f'<span class="missing-tag">+ {escape(s)}</span>' for s in role["skills_to_learn"]), unsafe_allow_html=True)
+                elif not has_resume:
+                    job_obj = next((j for j in JOB_CATALOG if j["id"] == role["id"]), None)
+                    bonus_list = job_obj["bonus_skills"] if job_obj else []
+                    st.markdown("".join(f'<span class="skill-tag" style="background:#F0FDF4; color:#166534; border-color:#BBF7D0;">+ {escape(s)}</span>' for s in bonus_list), unsafe_allow_html=True)
+                else:
+                    st.caption("All core prerequisites satisfied!")
+
+            # Compensation & Progression
+            st.markdown(
+                f'<div style="font-size:12px; color:#64748B; margin-top:10px; border-top:1px solid #E2E8F0; padding-top:8px;">'
+                f'<b>Compensation:</b> {escape(role["salary_range"])} &nbsp;|&nbsp; '
+                f'<b>Market Demand:</b> {escape(role["market_demand"])} &nbsp;|&nbsp; '
+                f'<b>Career Path:</b> {escape(role["growth_path"])}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+            # Action Links
+            act1, act2, act3, act4 = st.columns([1, 1, 1, 1.3])
+            with act1:
+                st.link_button("LinkedIn Jobs ↗", role["links"]["linkedin"], use_container_width=True)
+            with act2:
+                st.link_button("Indeed Jobs ↗", role["links"]["indeed"], use_container_width=True)
+            with act3:
+                st.link_button("Glassdoor ↗", role["links"]["glassdoor"], use_container_width=True)
+            with act4:
+                if st.button("Practice Mock Test 🎯", key=f"btn_explore_test_{role['id']}", type="secondary", use_container_width=True):
+                    job_obj = next((j for j in JOB_CATALOG if j["id"] == role["id"]), None)
+                    target_skills = role.get("matched_skills") or (job_obj["required_skills"] if job_obj else ["Python"])
+                    st.session_state.interview_test = generate_interview_test(
+                        candidate_skills=target_skills,
+                        resume_category=role["category"],
+                        num_questions=5,
+                        focus_mode="Balanced Mock Interview"
+                    )
+                    st.session_state.interview_answers = {}
+                    st.session_state.interview_eval = None
+                    st.session_state.page = "Interview"
+                    st.rerun()
+
+    st.markdown(
+        '<div class="footer">'
+        '<div class="brand">RESUMIND <span>AI</span></div>'
+        'AI Career Intelligence & Job Predictions<br>'
         '&copy; 2026 Resumind AI'
         '</div>',
         unsafe_allow_html=True
