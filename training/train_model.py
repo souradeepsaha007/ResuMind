@@ -1,349 +1,326 @@
-import os
-import sys
+
 from pathlib import Path
+import json
+
+import joblib
+import numpy as np
+import pandas as pd
 import torch
 
-# ==========================================
-# 0. RESOLVE IMPORT SHADOWING
-# ==========================================
-# Prevent local 'training/datasets' folder from shadowing HuggingFace 'datasets' library
-_script_dir = os.path.dirname(os.path.abspath(__file__))
-if _script_dir in sys.path:
-    sys.path.remove(_script_dir)
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 
-# Ensure project root is in sys.path for internal modules
-_project_root = os.path.abspath(os.path.join(_script_dir, ".."))
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import f1_score
 
-try:
-    from datasets import load_dataset
-except ImportError as err:
-    raise ImportError(
-        f"Failed to load HuggingFace 'datasets' library: {err}\n"
-        "Please run: pip install datasets"
-    )
+# =====================================================
+# 1. PROJECT PATHS
+# =====================================================
 
-try:
-    from transformers import (
-        AutoTokenizer,
-        AutoModelForCausalLM,
-        BitsAndBytesConfig,
-        TrainingArguments,
-        Trainer,
-        DataCollatorForLanguageModeling
-    )
-    from peft import (
-        LoraConfig,
-        get_peft_model,
-        prepare_model_for_kbit_training
-    )
-except ImportError as err:
-    raise ImportError(
-        f"Failed to import transformers/peft: {err}\n"
-        "Please run: pip install transformers peft accelerate"
-    )
+ROOT = Path(__file__).resolve().parents[1]
 
+TRAIN_FILE = ROOT / "dataset" / "skills_train.csv"
+VALID_FILE = ROOT / "dataset" / "skills_validation.csv"
 
-# ==========================================
-# 1. PROJECT CONFIGURATION
-# ==========================================
+MODEL_DIR = ROOT / "models"
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-MODEL_NAME = "google/gemma-3-1b-it"
+MODEL_PATH = MODEL_DIR / "soura_skill_model.pth"
+VECTORIZER_PATH = MODEL_DIR / "soura_vectorizer.joblib"
+METADATA_PATH = MODEL_DIR / "model_metadata.json"
 
-# Auto-detect project directory (Google Colab vs Local Windows/Linux)
-if os.path.exists("/content/AI_Resume_Analyser"):
-    PROJECT_DIR = "/content/AI_Resume_Analyser"
-else:
-    PROJECT_DIR = _project_root
+# =====================================================
+# 2. TRAINING CONFIGURATION
+# =====================================================
 
-TRAIN_FILE = os.path.join(
-    PROJECT_DIR, "dataset", "train.jsonl"
+EPOCHS = 40
+BATCH_SIZE = 8
+LEARNING_RATE = 0.001
+
+DEVICE = torch.device(
+    "cuda" if torch.cuda.is_available() else "cpu"
 )
 
-VALIDATION_FILE = os.path.join(
-    PROJECT_DIR, "dataset", "validation.jsonl"
-)
+print("=" * 50)
+print("SOURA SKILLNET - TRAINING FROM SCRATCH")
+print("=" * 50)
+print("Device:", DEVICE)
 
-OUTPUT_DIR = os.path.join(
-    PROJECT_DIR, "models", "resumind-ai-lora"
-)
+if torch.cuda.is_available():
+    print("GPU:", torch.cuda.get_device_name(0))
 
-MAX_LENGTH = 1024
+# =====================================================
+# 3. DEFINE NEURAL NETWORK
+# =====================================================
 
+class SouraSkillNet(nn.Module):
 
-# ==========================================
-# 2. CHECK HARDWARE & ACCELERATION
-# ==========================================
+    def __init__(self, input_size, number_of_labels):
 
-has_cuda = torch.cuda.is_available()
+        super().__init__()
 
-if has_cuda:
-    device_name = torch.cuda.get_device_name(0)
-    print(f"GPU detected: {device_name}")
-else:
-    print("Notice: CUDA GPU not detected. Training will run on CPU or in Google Colab with GPU runtime.")
+        self.network = nn.Sequential(
 
+            nn.Linear(input_size, 128),
+            nn.ReLU(),
+            nn.Dropout(0.20),
 
-# ==========================================
-# 3. VERIFY DATASET FILES
-# ==========================================
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(0.15),
 
-if not os.path.exists(TRAIN_FILE):
-    raise FileNotFoundError(
-        f"Training dataset not found at: {TRAIN_FILE}\n"
-        "Please ensure dataset/train.jsonl exists."
-    )
-
-if not os.path.exists(VALIDATION_FILE):
-    raise FileNotFoundError(
-        f"Validation dataset not found at: {VALIDATION_FILE}\n"
-        "Please ensure dataset/validation.jsonl exists."
-    )
-
-print("Dataset paths verified:")
-print(f" - Train: {TRAIN_FILE}")
-print(f" - Validation: {VALIDATION_FILE}")
-
-
-# ==========================================
-# 4. LOAD TOKENIZER
-# ==========================================
-
-print(f"\nLoading tokenizer for {MODEL_NAME}...")
-
-tokenizer = AutoTokenizer.from_pretrained(
-    MODEL_NAME
-)
-
-if tokenizer.pad_token is None:
-    tokenizer.pad_token = tokenizer.eos_token
-
-tokenizer.padding_side = "right"
-
-
-# ==========================================
-# 5. LOAD DATASET
-# ==========================================
-
-print("Loading resume datasets...")
-
-dataset = load_dataset(
-    "json",
-    data_files={
-        "train": TRAIN_FILE,
-        "validation": VALIDATION_FILE
-    }
-)
-
-print("Dataset summary:", dataset)
-
-
-# ==========================================
-# 6. PREPARE TRAINING TEXT & CHAT TEMPLATE
-# ==========================================
-
-def format_example(example):
-    messages = example["messages"]
-
-    # Use tokenizer's chat template or format messages as plain conversational text
-    if hasattr(tokenizer, "apply_chat_template") and tokenizer.chat_template:
-        try:
-            text = tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=False
-            )
-            return {"text": text}
-        except Exception:
-            pass
-
-    # Fallback message formatter
-    formatted = []
-    for msg in messages:
-        role = msg.get("role", "user").capitalize()
-        content = msg.get("content", "")
-        formatted.append(f"<|start_header_id|>{role}<|end_header_id|>\n{content}<|eot_id|>")
-    return {"text": "\n".join(formatted)}
-
-
-dataset = dataset.map(format_example)
-
-
-def tokenize_example(example):
-    return tokenizer(
-        example["text"],
-        truncation=True,
-        max_length=MAX_LENGTH,
-        add_special_tokens=False
-    )
-
-
-tokenized_dataset = dataset.map(
-    tokenize_example,
-    remove_columns=dataset["train"].column_names
-)
-
-print("Dataset preprocessing completed!")
-
-
-# ==========================================
-# 7. QUANTIZATION & MODEL CONFIGURATION
-# ==========================================
-
-use_4bit = False
-bnb_config = None
-
-if has_cuda:
-    try:
-        import bitsandbytes as bnb
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True
+            nn.Linear(64, number_of_labels)
         )
-        use_4bit = True
-        print("BitsAndBytes 4-bit NF4 quantization enabled.")
-    except Exception as bnb_err:
-        print(f"Notice: bitsandbytes not loaded ({bnb_err}). Using FP16.")
+
+    def forward(self, x):
+        return self.network(x)
 
 
-# ==========================================
-# 8. LOAD GEMMA BASE MODEL
-# ==========================================
+# =====================================================
+# 4. VERIFY DATASET
+# =====================================================
 
-print(f"\nLoading base model: {MODEL_NAME}...")
+if not TRAIN_FILE.exists():
+    raise FileNotFoundError(
+        f"Training file missing: {TRAIN_FILE}"
+    )
 
-model_load_args = {
-    "device_map": "auto" if has_cuda else "cpu"
+if not VALID_FILE.exists():
+    raise FileNotFoundError(
+        f"Validation file missing: {VALID_FILE}"
+    )
+
+train_df = pd.read_csv(TRAIN_FILE).fillna("")
+valid_df = pd.read_csv(VALID_FILE).fillna("")
+
+if "resume_text" not in train_df.columns:
+    raise ValueError(
+        "Training CSV must contain a resume_text column."
+    )
+
+if "resume_text" not in valid_df.columns:
+    raise ValueError(
+        "Validation CSV must contain a resume_text column."
+    )
+
+LABELS = [
+    column for column in train_df.columns
+    if column != "resume_text"
+]
+
+if not LABELS:
+    raise ValueError("No skill labels found in training CSV.")
+
+if LABELS != [
+    column for column in valid_df.columns
+    if column != "resume_text"
+]:
+    raise ValueError(
+        "Training and validation columns must match exactly."
+    )
+
+train_texts = train_df["resume_text"].astype(str).tolist()
+valid_texts = valid_df["resume_text"].astype(str).tolist()
+
+if not train_texts or not valid_texts:
+    raise ValueError("Training and validation datasets cannot be empty.")
+
+y_train = train_df[LABELS].astype(float).to_numpy()
+y_valid = valid_df[LABELS].astype(float).to_numpy()
+
+if not np.isin(y_train, [0, 1]).all():
+    raise ValueError("Training labels must contain only 0 and 1.")
+
+if not np.isin(y_valid, [0, 1]).all():
+    raise ValueError("Validation labels must contain only 0 and 1.")
+
+if not np.isfinite(y_train).all() or not np.isfinite(y_valid).all():
+    raise ValueError("Dataset contains invalid numeric labels.")
+
+print("\nTraining examples:", len(train_texts))
+print("Validation examples:", len(valid_texts))
+print("Skills:", LABELS)
+
+# =====================================================
+# 5. LEARN TEXT VOCABULARY
+# =====================================================
+
+vectorizer = TfidfVectorizer(
+    max_features=5000,
+    ngram_range=(1, 2),
+    sublinear_tf=True,
+    stop_words="english"
+)
+
+x_train = vectorizer.fit_transform(
+    train_texts
+).toarray()
+
+x_valid = vectorizer.transform(
+    valid_texts
+).toarray()
+
+if x_train.shape[1] == 0:
+    raise ValueError(
+        "No vocabulary was learned. Check your resume text."
+    )
+
+print("Learned vocabulary size:", x_train.shape[1])
+
+# =====================================================
+# 6. CONVERT DATA TO PYTORCH TENSORS
+# =====================================================
+
+x_train = torch.tensor(
+    x_train,
+    dtype=torch.float32
+)
+
+y_train = torch.tensor(
+    y_train,
+    dtype=torch.float32
+)
+
+x_valid = torch.tensor(
+    x_valid,
+    dtype=torch.float32,
+    device=DEVICE
+)
+
+y_valid = torch.tensor(
+    y_valid,
+    dtype=torch.float32,
+    device=DEVICE
+)
+
+train_loader = DataLoader(
+    TensorDataset(x_train, y_train),
+    batch_size=BATCH_SIZE,
+    shuffle=True
+)
+
+# =====================================================
+# 7. INITIALISE MODEL FROM RANDOM WEIGHTS
+# =====================================================
+
+model = SouraSkillNet(
+    input_size=x_train.shape[1],
+    number_of_labels=len(LABELS)
+).to(DEVICE)
+
+loss_function = nn.BCEWithLogitsLoss()
+
+optimizer = torch.optim.Adam(
+    model.parameters(),
+    lr=LEARNING_RATE
+)
+
+print("\nModel initialised from random weights.")
+print("Training started...\n")
+
+# =====================================================
+# 8. TRAIN MODEL
+# =====================================================
+
+for epoch in range(EPOCHS):
+
+    model.train()
+    total_loss = 0.0
+
+    for batch_x, batch_y in train_loader:
+
+        batch_x = batch_x.to(DEVICE)
+        batch_y = batch_y.to(DEVICE)
+
+        optimizer.zero_grad()
+
+        outputs = model(batch_x)
+
+        loss = loss_function(
+            outputs,
+            batch_y
+        )
+
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+
+    # Validation
+    model.eval()
+
+    with torch.no_grad():
+
+        predictions = torch.sigmoid(model(x_valid))
+
+        predicted_labels = (
+            predictions >= 0.5
+        ).cpu().numpy()
+
+        actual_labels = y_valid.cpu().numpy()
+
+        validation_f1 = f1_score(
+            actual_labels,
+            predicted_labels,
+            average="micro",
+            zero_division=0
+        )
+
+    average_loss = total_loss / len(train_loader)
+
+    print(
+        f"Epoch {epoch + 1:02d}/{EPOCHS} | "
+        f"Loss: {average_loss:.4f} | "
+        f"Validation F1: {validation_f1:.4f}"
+    )
+
+# =====================================================
+# 9. SAVE TRAINED MODEL
+# =====================================================
+
+model = model.cpu()
+
+torch.save(
+    {
+        "state_dict": model.state_dict(),
+        "input_size": x_train.shape[1],
+        "labels": LABELS
+    },
+    MODEL_PATH
+)
+
+joblib.dump(
+    vectorizer,
+    VECTORIZER_PATH
+)
+
+metadata = {
+    "model_name": "Soura SkillNet",
+    "architecture": "TF-IDF + PyTorch Neural Network",
+    "training_method": "Random initialization and supervised training",
+    "labels": LABELS,
+    "input_size": int(x_train.shape[1]),
+    "epochs": EPOCHS,
+    "validation_micro_f1": float(validation_f1)
 }
 
-if has_cuda:
-    model_load_args["torch_dtype"] = torch.float16
-    if use_4bit and bnb_config is not None:
-        model_load_args["quantization_config"] = bnb_config
+with open(
+    METADATA_PATH,
+    "w",
+    encoding="utf-8"
+) as file:
 
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME,
-    **model_load_args
-)
+    json.dump(
+        metadata,
+        file,
+        indent=4
+    )
 
-model.config.use_cache = False
+print("\n" + "=" * 50)
+print("SOURA SKILLNET TRAINING COMPLETE")
+print("=" * 50)
 
-if use_4bit:
-    model = prepare_model_for_kbit_training(model)
-
-
-# ==========================================
-# 9. CONFIGURE LORA ADAPTER
-# ==========================================
-
-lora_config = LoraConfig(
-    r=8,
-    lora_alpha=16,
-    lora_dropout=0.05,
-    bias="none",
-    task_type="CAUSAL_LM",
-    target_modules=[
-        "q_proj",
-        "k_proj",
-        "v_proj",
-        "o_proj",
-        "gate_proj",
-        "up_proj",
-        "down_proj"
-    ]
-)
-
-model = get_peft_model(
-    model,
-    lora_config
-)
-
-print("\nLoRA trainable parameters:")
-model.print_trainable_parameters()
-
-
-# ==========================================
-# 10. DATA COLLATOR
-# ==========================================
-
-data_collator = DataCollatorForLanguageModeling(
-    tokenizer=tokenizer,
-    mlm=False
-)
-
-
-# ==========================================
-# 11. TRAINING CONFIGURATION
-# ==========================================
-
-training_optimizer = "paged_adamw_8bit" if use_4bit else "adamw_torch"
-
-training_args = TrainingArguments(
-    output_dir=OUTPUT_DIR,
-    num_train_epochs=3,
-    per_device_train_batch_size=1,
-    per_device_eval_batch_size=1,
-    gradient_accumulation_steps=4,
-    learning_rate=2e-4,
-    fp16=has_cuda,
-    logging_steps=5,
-    save_strategy="epoch",
-    save_total_limit=2,
-    warmup_ratio=0.03,
-    weight_decay=0.01,
-    gradient_checkpointing=has_cuda,
-    report_to="none",
-    optim=training_optimizer
-)
-
-
-# ==========================================
-# 12. CREATE TRAINER
-# ==========================================
-
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_dataset["train"],
-    eval_dataset=tokenized_dataset["validation"],
-    data_collator=data_collator
-)
-
-
-# ==========================================
-# 13. START TRAINING
-# ==========================================
-
-print("\nStarting Resumind AI model fine-tuning...\n")
-
-trainer.train()
-
-
-# ==========================================
-# 14. EVALUATE MODEL
-# ==========================================
-
-print("\nEvaluating fine-tuned model...")
-
-evaluation = trainer.evaluate()
-
-print("Evaluation results:", evaluation)
-
-
-# ==========================================
-# 15. SAVE TRAINED MODEL
-# ==========================================
-
-print(f"\nSaving trained LoRA adapter to: {OUTPUT_DIR}...")
-
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-model.save_pretrained(OUTPUT_DIR)
-tokenizer.save_pretrained(OUTPUT_DIR)
-
-print("\n=================================")
-print("RESUMIND AI MODEL TRAINING COMPLETE")
-print("=================================")
-print(f"Saved LoRA adapter at: {OUTPUT_DIR}")
+print("Model:", MODEL_PATH)
+print("Vectorizer:", VECTORIZER_PATH)
+print("Metadata:", METADATA_PATH)
+print("Validation micro-F1:", round(validation_f1, 4))
