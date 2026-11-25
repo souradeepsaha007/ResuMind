@@ -11,7 +11,7 @@ from config import OLLAMA_HOST, MODEL_NAME as AI_MODEL
 # ============================================================
 
 def get_ollama_client():
-    return ollama.Client(host=OLLAMA_HOST)
+    return ollama.Client(host=OLLAMA_HOST, timeout=4.0)
 
 
 # ============================================================
