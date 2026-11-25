@@ -15,6 +15,7 @@ from llm_analyzer import analyze_resume
 from ai_engine.resume_observer import SKILL_DATABASE
 from interview_engine import generate_interview_test, evaluate_test, generate_interview_pdf_report
 from job_predictor import predict_job_options, JOB_CATALOG
+from resume_validator import validate_resume_document
 
 
 # ==========================================================
@@ -1076,9 +1077,20 @@ if st.session_state.page == "Analysis":
 
         if uploaded_file:
 
-            st.success(
-                f"✓ Resume loaded: {uploaded_file.name} ({len(uploaded_file.getvalue()) / 1024:.1f} KB)"
-            )
+            try:
+                pre_check_text = extract_pdf_text(uploaded_file)
+                val_result = validate_resume_document(pre_check_text) if pre_check_text else {"is_valid": False, "rejection_reason": "Empty or unreadable document.", "document_type": "Unreadable"}
+            except Exception as e:
+                val_result = {"is_valid": False, "rejection_reason": f"PDF parse error: {e}", "document_type": "Unreadable"}
+
+            if val_result.get("is_valid"):
+                st.success(
+                    f"✓ Resume Verified ({val_result.get('confidence_score', 0):.0f}% Match): {uploaded_file.name} ({len(uploaded_file.getvalue()) / 1024:.1f} KB)"
+                )
+            else:
+                st.error(
+                    f"🛑 **Document Notice ({val_result.get('document_type', 'Invalid')}):** {val_result.get('rejection_reason')}"
+                )
 
     with input2:
 
@@ -1134,6 +1146,18 @@ if st.session_state.page == "Analysis":
                             "No readable text found in this PDF. "
                             "Scanned PDFs require OCR."
                         )
+
+                    # Strict Resume Gatekeeper Validation
+                    val_check = validate_resume_document(resume_text)
+                    if not val_check["is_valid"]:
+                        st.error(
+                            f"🛑 **Document Verification Failed: Not a Valid Resume**\n\n"
+                            f"{val_check['rejection_reason']}\n\n"
+                            "**ResuMind AI Gatekeeper Policy:** Only authentic candidate resumes or CVs are analyzed. "
+                            "Documents such as invoices, research papers, legal agreements, receipts, and arbitrary articles are blocked to prevent false profiles and hallucinated scores."
+                        )
+                        st.info("💡 Please upload a valid text-based candidate resume containing sections such as Work Experience, Education, or Skills.")
+                        st.stop()
 
                     candidate = extract_candidate_information(
                         resume_text
@@ -1207,6 +1231,7 @@ if st.session_state.page == "Analysis":
                         "candidate": candidate,
                         "soura_result": soura_result,
                         "match_data": match_data,
+                        "validation": val_check,
                         "filename": uploaded_file.name,
                         "created_at": datetime.now().strftime(
                             "%d %b %Y, %I:%M %p"

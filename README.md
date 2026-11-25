@@ -100,6 +100,7 @@ If you are running the app on your laptop and want a friend or colleague in the 
 
 - **Frontend & UI**: Streamlit (Light Mode Design System)
 - **Deep Learning / Neural Engine**: PyTorch (`SkillNet` & `ResumindMatchNet` with CPU & GPU support)
+- **Document Gatekeeping Classifier**: Intelligent Resume Verification (filters out invoices, papers, agreements, receipts)
 - **PDF Extraction**: PyMuPDF (`fitz`)
 - **Machine Learning**: Scikit-Learn (`TfidfVectorizer`), NumPy, Pandas
 - **Visualization**: Plotly Graph Objects

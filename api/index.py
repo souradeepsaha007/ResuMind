@@ -18,11 +18,13 @@ try:
     from matcher import calculate_match
     from llm_analyzer import analyse_resume
     from config import DEVICE, APP_NAME
+    from resume_validator import validate_resume_document
 except ImportError:
     # If run from root
     from matcher import calculate_match  # type: ignore
     from llm_analyzer import analyse_resume  # type: ignore
     from config import DEVICE, APP_NAME  # type: ignore
+    from resume_validator import validate_resume_document  # type: ignore
 
 app = FastAPI(
     title="Resumind AI",
@@ -1013,6 +1015,14 @@ async def analyze_endpoint(
     if not resume_text:
         raise HTTPException(status_code=400, detail="No resume content provided. Please upload a valid PDF or submit resume text.")
 
+    # Validate that document is an authentic resume/CV
+    val_check = validate_resume_document(resume_text)
+    if not val_check["is_valid"]:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Document Validation Failed ({val_check.get('document_type', 'Invalid')}): {val_check['rejection_reason']}"
+        )
+
     if not job_description:
         raise HTTPException(status_code=400, detail="Job description is required.")
 
@@ -1034,6 +1044,12 @@ async def analyze_endpoint(
     return {
         "success": True,
         "filename": filename,
+        "document_validation": {
+            "is_valid": True,
+            "confidence_score": val_check.get("confidence_score", 100),
+            "document_type": val_check.get("document_type", "Candidate Resume / CV"),
+            "detected_sections": val_check.get("detected_sections", [])
+        },
         "match_score": match_data.get("match_score", 0),
         "ats_score": match_data.get("ats_score", 0),
         "matched_skills": match_data.get("matched_skills", []),

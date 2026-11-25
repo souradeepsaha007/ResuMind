@@ -30,6 +30,19 @@ def analyse_resume(resume_text: str, job_description: Optional[str] = None) -> s
     if not resume_text or not resume_text.strip():
         return "No readable resume content provided for analysis."
 
+    # Validate that document is an authentic resume/CV
+    try:
+        from resume_validator import validate_resume_document
+        val = validate_resume_document(resume_text)
+        if not val["is_valid"]:
+            return f"""### Document Verification Alert
+The submitted document could not be validated as an authentic Candidate Resume or CV.
+- **Identified Document Category:** {val.get('document_type', 'Non-Resume')}
+- **Validation Notice:** {val.get('rejection_reason')}
+- **Resolution:** ResuMind AI is exclusively calibrated for candidate resumes and curriculum vitae (CVs). Please submit a text-based resume containing standard career sections (Experience, Education, or Skills)."""
+    except Exception:
+        pass
+
     job_description = job_description or ""
 
     # 1. Run PyTorch SkillNet
@@ -145,6 +158,17 @@ def analyze_resume(pdf_path, job_description: Optional[str] = None) -> Dict[str,
         import pymupdf
         with pymupdf.open(pdf_path) as doc:
             resume_text = "\n".join(page.get_text("text", sort=True) for page in doc)
+
+    # Validate that document is an authentic resume/CV
+    try:
+        from resume_validator import validate_resume_document
+        val = validate_resume_document(resume_text)
+        if not val["is_valid"]:
+            raise ValueError(f"Document Verification Failed ({val.get('document_type', 'Invalid')}): {val['rejection_reason']}")
+    except ValueError:
+        raise
+    except Exception:
+        pass
 
     skill_predictions = []
     if predict_skills is not None and resume_text.strip():

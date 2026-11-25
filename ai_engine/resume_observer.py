@@ -515,6 +515,14 @@ def observe_resume(file_path):
 
     text = clean_text(raw_text)
 
+    # Optional document validation audit
+    validation_info = {}
+    try:
+        from resume_validator import validate_resume_document
+        validation_info = validate_resume_document(text)
+    except Exception:
+        pass
+
     sections = identify_sections(text)
 
     skills = detect_skills(text)
@@ -566,6 +574,8 @@ def observe_resume(file_path):
         "references": sections["references"],
 
         "experience_years_mentioned": detect_experience_years(text),
+
+        "validation": validation_info,
 
         "full_text": text
 
